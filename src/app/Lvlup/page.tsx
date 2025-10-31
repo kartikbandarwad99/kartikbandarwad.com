@@ -19,8 +19,9 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { X } from "lucide-react";
-import { useFormStatus } from "react-dom";
-import { submitApplicationAction } from "@/app/actions/lvlupsubmit"; // server action (Promise<void>)
+import { useActionState } from "react";
+import { toast } from "sonner";
+import { submitApplicationAction, type SubmitState } from "@/app/actions/lvlupsubmit";
 
 // ============================ react-select dark styles ============================
 const customStyles = {
@@ -69,6 +70,9 @@ const customStyles = {
 
 type OptionType = { value: string; label: string };
 
+// single source of truth for input backgrounds
+const FORM_INPUT_BG = "#181818";
+
 // ============================ Cards data ============================
 type PartnerCard = {
   id: string;
@@ -82,227 +86,58 @@ type PartnerCard = {
 };
 
 const partnersCards: PartnerCard[] = [
-  {
-    id: "lvlup",
-    name: "LvlUp Ventures Seed Fund",
-    stage: "Pre-Seed to Seed",
-    cheque: "$100,000 – $250,000",
-    focus: "Industry agnostic",
-    regions: "United States, Canada",
-    criteria: ">3 months in market",
-  },
-  {
-    id: "cove-fund",
-    name: "Cove Fund",
-    stage: "Pre-Seed to Series A",
-    cheque: "~$500,000",
-    focus: "Deep Tech, Life Sciences, Enterprise Software, Data Analytics",
-    regions: "Southern California",
-    criteria: "Strong moat and product-market fit",
-  },
-  {
-    id: "expertdojo",
-    name: "ExpertDojo",
-    stage: "Seed to Series A",
-    cheque: "$50,000 – $3,000,000",
-    focus: "Industry agnostic; emphasis on underrepresented founders (not a requirement)",
-    regions: "Agnostic",
-  },
-  {
-    id: "loreal-cvc",
-    name: "L’Oréal Corporate Venture Arm",
-    stage: "Strategic CVC / Acquisitions (Series A–C)",
-    focus: "Beauty tech, retail innovation, sustainability; innovations enhancing L’Oréal’s ecosystem",
-    criteria: "Potential for integration with L’Oréal’s core businesses",
-  },
-  {
-    id: "sunset-ventures",
-    name: "Sunset Ventures",
-    stage: "Post-Seed",
-    focus: "MediaTech, Creative Industries, Commerce, FinTech, Software",
-    regions: "U.S. (California preferred)",
-    criteria: "≥$250K annual revenue",
-  },
-  {
-    id: "acronym",
-    name: "Acronym VC",
-    stage: "Late Seed to Series A",
-    focus:
-      "Enterprise & SMB SaaS — FinTech, Hospitality Tech, PropTech, Workflow, E-commerce Infrastructure, Cybersecurity, select Healthcare SaaS",
-    regions: "U.S.",
-  },
-  {
-    id: "apus-vc",
-    name: "Apus VC",
-    stage: "Early-stage (Post-revenue)",
-    focus: "Tech and Real Estate; long-term growth with strategic/operational support",
-    criteria: "Founders open to active partnership and board participation",
-  },
-  {
-    id: "greycroft",
-    name: "Greycroft",
-    stage: "Seed to Series C",
-    cheque: "Up to $50,000,000",
-    focus: "Software generalists with emphasis on AI apps (consumer/B2B) and infrastructure",
-    regions: "Primarily U.S.",
-  },
-  {
-    id: "minnow",
-    name: "Minnow Ventures",
-    stage: "Pre-Seed to Series A",
-    focus: "Healthcare — Biotech, HealthTech, AI in Healthcare, Drug Discovery, Lab Infrastructure",
-    criteria: "Early-stage companies advancing healthcare innovation",
-  },
-  {
-    id: "outlander",
-    name: "Outlander VC",
-    stage: "Pre-Seed and Seed",
-    focus: "Industry agnostic",
-    regions: "U.S.",
-    criteria: "Strong early-stage founders with scalable potential",
-    blurb: "Currently deploying Fund III ($150M).",
-  },
-  {
-    id: "rpv-global",
-    name: "RPV Global",
-    stage: "Pre-Seed",
-    focus: "Deep Tech (excludes Biotech, Pharma, Longevity, Psychedelics, Crypto, Software)",
-    criteria: "U.S.-based with a proven scientific breakthrough",
-  },
-  {
-    id: "brickyard",
-    name: "Brickyard",
-    stage: "Pre-Seed and Seed",
-    cheque: "Up to $500,000",
-    focus: "Industry agnostic",
-    regions:
-      "Global founders accepted; onsite in Chattanooga, TN until $1M ARR (optional for other team members)",
-    criteria: "Founders committed to full focus and execution (“burn the ships”)",
-  },
-  {
-    id: "enough",
-    name: "Enough Ventures",
-    stage: "Pre-Seed and Seed",
-    focus: "HealthTech, AgeTech, Digital Infrastructure",
-    regions: "Agnostic",
-    criteria: "Purpose-driven ventures with measurable impact",
-  },
-  {
-    id: "capital-midwest",
-    name: "Capital Midwest Fund",
-    stage: "Seed and Series A",
-    focus: "Early revenue–stage software & tech-enabled (excludes healthcare and hardware)",
-    regions: "Central U.S.",
-    criteria: "Independent or syndicate participation",
-  },
-  {
-    id: "lvlup-labs",
-    name: "LvlUp Labs",
-    stage: "N/A (Community platform, not a fund)",
-    focus: "Founders-only community powered by LvlUp Ventures’ ecosystem",
-    criteria: "Open to top-tier founders; free membership",
-  },
-  {
-    id: "new-road",
-    name: "New Road Capital",
-    stage: "Growth to Expansion",
-    cheque: "$5,000,000 – $20,000,000",
-    focus: "Supply Chain & Logistics, Retail Technology, Marketing Technology",
-    regions: "Mainly U.S.",
-    criteria: "≥$1M ARR; PMF achieved",
-  },
-  {
-    id: "incisive",
-    name: "Incisive Ventures",
-    stage: "Pre-Seed",
-    cheque: "$250,000 – $750,000",
-    focus:
-      "B2B software; invests after MVP has been in customers’ hands ≥3 months; typical rounds $500K–$2M",
-    criteria: "Post-revenue; product in-market with early customer validation",
-  },
-  {
-    id: "connetic",
-    name: "Connetic Ventures",
-    stage: "Pre-Seed and Seed",
-    cheque: "$500,000 – $1,000,000",
-    focus: "Software, Data Analytics, FinTech, Consumer Products",
-    regions: "North America (except Bay Area and Boston)",
-  },
+  { id: "lvlup", name: "LvlUp Ventures Seed Fund", stage: "Pre-Seed to Seed", cheque: "$100,000 – $250,000", focus: "Industry agnostic", regions: "United States, Canada", criteria: ">3 months in market" },
+  { id: "cove-fund", name: "Cove Fund", stage: "Pre-Seed to Series A", cheque: "~$500,000", focus: "Deep Tech, Life Sciences, Enterprise Software, Data Analytics", regions: "Southern California", criteria: "Strong moat and product-market fit" },
+  { id: "expertdojo", name: "ExpertDojo", stage: "Seed to Series A", cheque: "$50,000 – $3,000,000", focus: "Industry agnostic; emphasis on underrepresented founders (not a requirement)", regions: "Agnostic" },
+  { id: "loreal-cvc", name: "L’Oréal Corporate Venture Arm", stage: "Strategic CVC / Acquisitions (Series A–C)", focus: "Beauty tech, retail innovation, sustainability; innovations enhancing L’Oréal’s ecosystem", criteria: "Potential for integration with L’Oréal’s core businesses" },
+  { id: "sunset-ventures", name: "Sunset Ventures", stage: "Post-Seed", focus: "MediaTech, Creative Industries, Commerce, FinTech, Software", regions: "U.S. (California preferred)", criteria: "≥$250K annual revenue" },
+  { id: "acronym", name: "Acronym VC", stage: "Late Seed to Series A", focus: "Enterprise & SMB SaaS — FinTech, Hospitality Tech, PropTech, Workflow, E-commerce Infrastructure, Cybersecurity, select Healthcare SaaS", regions: "U.S." },
+  { id: "apus-vc", name: "Apus VC", stage: "Early-stage (Post-revenue)", focus: "Tech and Real Estate; long-term growth with strategic/operational support", criteria: "Founders open to active partnership and board participation" },
+  { id: "greycroft", name: "Greycroft", stage: "Seed to Series C", cheque: "Up to $50,000,000", focus: "Software generalists with emphasis on AI apps (consumer/B2B) and infrastructure", regions: "Primarily U.S." },
+  { id: "minnow", name: "Minnow Ventures", stage: "Pre-Seed to Series A", focus: "Healthcare — Biotech, HealthTech, AI in Healthcare, Drug Discovery, Lab Infrastructure", criteria: "Early-stage companies advancing healthcare innovation" },
+  { id: "outlander", name: "Outlander VC", stage: "Pre-Seed and Seed", focus: "Industry agnostic", regions: "U.S.", criteria: "Strong early-stage founders with scalable potential", blurb: "Currently deploying Fund III ($150M)." },
+  { id: "rpv-global", name: "RPV Global", stage: "Pre-Seed", focus: "Deep Tech (excludes Biotech, Pharma, Longevity, Psychedelics, Crypto, Software)", criteria: "U.S.-based with a proven scientific breakthrough" },
+  { id: "brickyard", name: "Brickyard", stage: "Pre-Seed and Seed", cheque: "Up to $500,000", focus: "Industry agnostic", regions: "Global founders accepted; onsite in Chattanooga, TN until $1M ARR (optional for other team members)", criteria: "Founders committed to full focus and execution (“burn the ships”)" },
+  { id: "enough", name: "Enough Ventures", stage: "Pre-Seed and Seed", focus: "HealthTech, AgeTech, Digital Infrastructure", regions: "Agnostic", criteria: "Purpose-driven ventures with measurable impact" },
+  { id: "capital-midwest", name: "Capital Midwest Fund", stage: "Seed and Series A", focus: "Early revenue–stage software & tech-enabled (excludes healthcare and hardware)", regions: "Central U.S.", criteria: "Independent or syndicate participation" },
+  { id: "lvlup-labs", name: "LvlUp Labs", stage: "N/A (Community platform, not a fund)", focus: "Founders-only community powered by LvlUp Ventures’ ecosystem", criteria: "Open to top-tier founders; free membership" },
+  { id: "new-road", name: "New Road Capital", stage: "Growth to Expansion", cheque: "$5,000,000 – $20,000,000", focus: "Supply Chain & Logistics, Retail Technology, Marketing Technology", regions: "Mainly U.S.", criteria: "≥$1M ARR; PMF achieved" },
+  { id: "incisive", name: "Incisive Ventures", stage: "Pre-Seed", cheque: "$250,000 – $750,000", focus: "B2B software; invests after MVP has been in customers’ hands ≥3 months; typical rounds $500K–$2M", criteria: "Post-revenue; product in-market with early customer validation" },
+  { id: "connetic", name: "Connetic Ventures", stage: "Pre-Seed and Seed", cheque: "$500,000 – $1,000,000", focus: "Software, Data Analytics, FinTech, Consumer Products", regions: "North America (except Bay Area and Boston)" },
 ];
 
 // ========= LvlUp Ventures Bootcamps =========
-type BootcampCard = {
-  id: string;
-  name: string;
-  subtitle: string;
-  description: string;
-  features: string[];
-};
-
+type BootcampCard = { id: string; name: string; subtitle: string; description: string; features: string[] };
 const bootcampCards: BootcampCard[] = [
   {
     id: "data-room",
     name: "LvlUp Cutting-Edge Data Room & Operations HQ Bootcamp",
     subtitle: "Build a world-class investor data room & ops HQ (Notion + AI).",
-    description:
-      "Self-paced, <30-day bootcamp to streamline operations and investor readiness. Ends with a live Demo Day & certification.",
-    features: [
-      "Free 6 months of Notion Pro + AI",
-      "1:1 session with LvlUp team",
-      "Weekly office hours & Demo Day with VCs",
-      "Top 3 win expedited funding review (up to $1M)",
-    ],
+    description: "Self-paced, <30-day bootcamp to streamline operations and investor readiness. Ends with a live Demo Day & certification.",
+    features: ["Free 6 months of Notion Pro + AI", "1:1 session with LvlUp team", "Weekly office hours & Demo Day with VCs", "Top 3 win expedited funding review (up to $1M)"],
   },
   {
     id: "cap-table",
     name: "Prime Equity & Cap Table Bootcamp",
     subtitle: "Master equity management and VC-ready cap tables.",
-    description:
-      "Learn how to structure ownership, model dilution, and forecast raises. Culminates in Demo Day & certification.",
-    features: [
-      "1:1 sessions with Qapita + LvlUp",
-      "Advisor agreement & templates included",
-      "Access 3,000+ investor list post-graduation",
-      "Top founders fast-tracked for $1M review",
-    ],
+    description: "Learn how to structure ownership, model dilution, and forecast raises. Culminates in Demo Day & certification.",
+    features: ["1:1 sessions with Qapita + LvlUp", "Advisor agreement & templates included", "Access 3,000+ investor list post-graduation", "Top founders fast-tracked for $1M review"],
   },
   {
     id: "financial-modeling",
     name: "LvlUp × Grasshopper Bank: Financial Modeling & Startup Banking Bootcamp",
     subtitle: "Optimize your financial systems and fundraising strategy.",
-    description:
-      "Self-paced program to master startup banking, cash flow, and modeling. Includes Demo Day with investors.",
-    features: [
-      "1:1 review with LvlUp & Grasshopper experts",
-      "Curated 1,700+ investor list",
-      "Workshops on cash flow & growth modeling",
-      "Demo Day + awards + fast-track for $1M funding",
-    ],
+    description: "Self-paced program to master startup banking, cash flow, and modeling. Includes Demo Day with investors.",
+    features: ["1:1 review with LvlUp & Grasshopper experts", "Curated 1,700+ investor list", "Workshops on cash flow & growth modeling", "Demo Day + awards + fast-track for $1M funding"],
   },
 ];
 
 // ========= LvlUp Applicant Exclusive Perks =========
 type ProgramCard = { id: string; name: string; subtitle: string; perks: string[] };
 const programsCards: ProgramCard[] = [
-  {
-    id: "wing",
-    name: "Wing × LvlUp Ventures Perk",
-    subtitle:
-      "Access Top-Tier Entry & Mid-Level Talent at LvlUp-Subsidized Rates (Starting at $500/Month) — Used by 1,000+ Teams at Google, DoorDash & Harvard University",
-    perks: ["Complimentary 1:1 consultation", "Earn a $50 startup grant after attending your consultation"],
-  },
-  {
-    id: "shields",
-    name: "Shields Group Executive Search × LvlUp Ventures Perk",
-    subtitle: "For High-Level Hires | FREE Hiring Strategy Session",
-    perks: [],
-  },
-  {
-    id: "gcloud",
-    name: "Google Cloud × LvlUp Ventures Perk",
-    subtitle: "Up To $350K in Free Credits",
-    perks: [],
-  },
+  { id: "wing", name: "Wing × LvlUp Ventures Perk", subtitle: "Access Top-Tier Entry & Mid-Level Talent at LvlUp-Subsidized Rates (Starting at $500/Month) — Used by 1,000+ Teams at Google, DoorDash & Harvard University", perks: ["Complimentary 1:1 consultation", "Earn a $50 startup grant after attending your consultation"] },
+  { id: "shields", name: "Shields Group Executive Search × LvlUp Ventures Perk", subtitle: "For High-Level Hires | FREE Hiring Strategy Session", perks: [] },
+  { id: "gcloud", name: "Google Cloud × LvlUp Ventures Perk", subtitle: "Up To $350K in Free Credits", perks: [] },
 ];
 
 // ============================ Form fields ============================
@@ -316,16 +151,7 @@ const industryOptions = [
 ];
 
 const regionOptions = [
-  "United States",
-  "LATAM",
-  "United Kingdom",
-  "Canada",
-  "Israel",
-  "Europe",
-  "India",
-  "Asia",
-  "Singapore",
-  "Other",
+  "United States","LATAM","United Kingdom","Canada","Israel","Europe","India","Asia","Singapore","Other",
 ].map((r) => ({ value: r, label: r }));
 
 const stageSelect = ["Bridge Round","Pre-Seed", "Seed","Seed Extension/Seed+", "Series A", "Series B","Series C"];
@@ -339,9 +165,9 @@ type FormValues = {
 
   companyName: string;
   companyWebsite: string;
-  industry: string[]; // ≤4
+  industry: string[];
   companyRegion: string;
-  elevatorPitch: string; // ≤300
+  elevatorPitch: string;
   pitchDeckPdf?: FileList;
   pitchDeckLink?: string;
 
@@ -375,7 +201,7 @@ function PillYesNo({
   required?: boolean;
 }) {
   const base =
-    "select-none rounded-full border border-neutral-700 bg-[#181818] px-4 py-2 text-sm text-white transition " +
+    "select-none rounded-full border border-neutral-700 bg-[var(--form-input-bg)] px-4 py-2 text-sm text-white transition " +
     "peer-checked:bg-lime-300 peer-checked:text-black peer-checked:border-lime-300 hover:border-lime-300 focus:outline-none";
   return (
     <div className="inline-flex gap-3">
@@ -391,32 +217,16 @@ function PillYesNo({
   );
 }
 
-/** Submit button that reflects Server Action pending state */
-function SubmitButton({
-  onClick,
-  disabled,
-}: {
-  onClick: () => void;
-  disabled?: boolean;
-}) {
-  const { pending } = useFormStatus();
-  return (
-    <Button
-      type="button"
-      onClick={onClick}
-      className="rounded-lg bg-lime-300 text-black font-semibold hover:bg-lime-200 disabled:opacity-60"
-      disabled={disabled || pending}
-    >
-      {pending ? "Submitting..." : "Submit"}
-    </Button>
-  );
-}
-
 export default function VCPartnersPage() {
-  /* ===== Selections (cards) ===== */
+  // set the CSS var once
+  useEffect(() => {
+    document.documentElement.style.setProperty("--form-input-bg", FORM_INPUT_BG);
+  }, []);
+
   const [selectedPartners, setSelectedPartners] = useState<string[]>([]);
   const [selectedCompetitions, setSelectedCompetitions] = useState<string[]>([]);
-  const [selectedPrograms, setSelectedPrograms] = useState<string[]>([]); // store PROGRAM NAMES
+  const [selectedPrograms, setSelectedPrograms] = useState<string[]>([]);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const togglePartner = (id: string) =>
     setSelectedPartners((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
@@ -430,16 +240,15 @@ export default function VCPartnersPage() {
   const toggleProgram = (programName: string) =>
     setSelectedPrograms((prev) => (prev.includes(programName) ? prev.filter((x) => x !== programName) : [...prev, programName]));
 
-  /* ===== Form ===== */
   const {
     register,
     control,
     reset,
     watch,
     setValue,
-    formState,
     getValues,
-    trigger, // <-- for programmatic validation
+    trigger,
+    formState,
   } = useForm<FormValues>({
     defaultValues: {
       industry: [],
@@ -449,27 +258,73 @@ export default function VCPartnersPage() {
     },
   });
 
-  useEffect(() => {
-    setValue("competitions", selectedCompetitions);
-  }, [selectedCompetitions, setValue]);
-
-  useEffect(() => {
-    setValue("programs", selectedPrograms);
-  }, [selectedPrograms, setValue]);
+  // bind card selections into form values (for submission/clear)
+  useEffect(() => setValue("competitions", selectedCompetitions), [selectedCompetitions, setValue]);
+  useEffect(() => setValue("programs", selectedPrograms), [selectedPrograms, setValue]);
 
   const elevatorPitch = watch("elevatorPitch") || "";
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const formRef = useRef<HTMLFormElement | null>(null);
-  const hiddenSubmitRef = useRef<HTMLButtonElement | null>(null);
 
-  // Build payload and submit natively to Server Action
+  // useActionState -> action signature (prev, formData) => state
+  const [submitState, formAction, isPending] = useActionState<SubmitState, FormData>(
+    submitApplicationAction,
+    { ok: false }
+  );
+
+  // show toast + clear on success
+  useEffect(() => {
+    if (!submitState) return;
+    if (submitState.ok) {
+      toast.success(submitState.message ?? "Submitted successfully");
+
+      // Clear everything
+      reset({
+        founderFirstName: "",
+        founderLastName: "",
+        founderEmail: "",
+        founderPhone: "",
+        companyName: "",
+        companyWebsite: "",
+        industry: [],
+        companyRegion: "",
+        elevatorPitch: "",
+        pitchDeckPdf: undefined,
+        pitchDeckLink: "",
+        isB2BSaaSWithRunway: undefined as unknown as YesNo,
+        sellsPhysicalProduct: undefined as unknown as YesNo,
+        hasFounderOver50: undefined as unknown as YesNo,
+        hasBlackFounder: undefined as unknown as YesNo,
+        hasFemaleFounder: undefined as unknown as YesNo,
+        isForeignBornInUS: undefined as unknown as YesNo,
+        fundraisingStage: "",
+        raiseAmount: "",
+        valuation: "",
+        mrr: "",
+        burnRate: "",
+        previouslyRaised: "",
+        wantsOtherCompetitions: undefined as unknown as YesNo,
+        programs: [],
+        competitions: [],
+      });
+      setSelectedPartners([]);
+      setSelectedCompetitions([]);
+      setSelectedPrograms([]);
+      setSelectedFile(null);
+
+      // also remove hidden payload input if present
+      const existing = formRef.current?.querySelector('input[name="payload"]') as HTMLInputElement | null;
+      if (existing) existing.remove();
+    } else if (submitState.error) {
+      toast.error(submitState.error);
+    }
+  }, [submitState, reset]);
+
   const handleSubmitClick = async () => {
-    const isValid = await trigger(); // RHF validation
+    const isValid = await trigger();
     if (!isValid || !formRef.current) return;
 
     const v = getValues();
-
     const payload = {
       partnersSelected: selectedPartners,
       competitionsSelected: selectedCompetitions,
@@ -508,19 +363,18 @@ export default function VCPartnersPage() {
       submittedAt: new Date().toISOString(),
     };
 
-    // ensure single hidden input named "payload"
-    const existing = formRef.current.querySelector('input[name="payload"]') as HTMLInputElement | null;
-    if (existing) existing.value = JSON.stringify(payload);
-    else {
-      const hidden = document.createElement("input");
+    // ensure hidden "payload"
+    let hidden = formRef.current.querySelector('input[name="payload"]') as HTMLInputElement | null;
+    if (!hidden) {
+      hidden = document.createElement("input");
       hidden.type = "hidden";
       hidden.name = "payload";
-      hidden.value = JSON.stringify(payload);
       formRef.current.appendChild(hidden);
     }
+    hidden.value = JSON.stringify(payload);
 
-    // call the native submission using the hidden submitter that points to the Server Action
-    formRef.current.requestSubmit(hiddenSubmitRef.current ?? undefined);
+    // native submit to the useActionState handler
+    formRef.current.requestSubmit();
   };
 
   const handleClearFile = () => {
@@ -536,9 +390,8 @@ export default function VCPartnersPage() {
       <Navbar />
 
       <div className="mx-auto w-full max-w-6xl px-6 lg:px-0 pt-24 md:pt-28 pb-16">
-        {/* widen left (7) and narrow right (5) */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12 items-start">
-          {/* ================= LEFT: Cards ================= */}
+          {/* LEFT */}
           <div className="md:col-span-7 space-y-8">
             {/* VC partners */}
             <section>
@@ -563,38 +416,16 @@ export default function VCPartnersPage() {
                       <div className="flex items-start justify-between gap-3">
                         <h3 className="text-lg font-semibold">{p.name}</h3>
                         {isSelected && (
-                          <span className="shrink-0 rounded-md bg-lime-300 px-2 py-0.5 text-xs font-bold text-black">
-                            Selected
-                          </span>
+                          <span className="shrink-0 rounded-md bg-lime-300 px-2 py-0.5 text-xs font-bold text-black">Selected</span>
                         )}
                       </div>
                       {p.blurb && <p className="text-sm text-neutral-400 mt-2">{p.blurb}</p>}
                       <div className="mt-3 grid gap-1 text-sm text-neutral-400">
-                        {p.focus && (
-                          <p>
-                            <span className="text-neutral-300 font-medium">Sectors:</span> {p.focus}
-                          </p>
-                        )}
-                        {p.regions && (
-                          <p>
-                            <span className="text-neutral-300 font-medium">Geography:</span> {p.regions}
-                          </p>
-                        )}
-                        {p.stage && (
-                          <p>
-                            <span className="text-neutral-300 font-medium">Stage:</span> {p.stage}
-                          </p>
-                        )}
-                        {p.cheque && (
-                          <p>
-                            <span className="text-neutral-300 font-medium">Cheque:</span> {p.cheque}
-                          </p>
-                        )}
-                        {p.criteria && (
-                          <p>
-                            <span className="text-neutral-300 font-medium">Criteria:</span> {p.criteria}
-                          </p>
-                        )}
+                        {p.focus && <p><span className="text-neutral-300 font-medium">Sectors:</span> {p.focus}</p>}
+                        {p.regions && <p><span className="text-neutral-300 font-medium">Geography:</span> {p.regions}</p>}
+                        {p.stage && <p><span className="text-neutral-300 font-medium">Stage:</span> {p.stage}</p>}
+                        {p.cheque && <p><span className="text-neutral-300 font-medium">Cheque:</span> {p.cheque}</p>}
+                        {p.criteria && <p><span className="text-neutral-300 font-medium">Criteria:</span> {p.criteria}</p>}
                       </div>
                     </button>
                   );
@@ -605,9 +436,7 @@ export default function VCPartnersPage() {
             {/* Bootcamps */}
             <section>
               <h2 className="text-2xl font-semibold">LvlUp Ventures Bootcamps</h2>
-              <Label className="text-neutral-400 text-xs uppercase tracking-wide">
-                (select the ones that apply)
-              </Label>
+              <Label className="text-neutral-400 text-xs uppercase tracking-wide">(select the ones that apply)</Label>
 
               <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {bootcampCards.map((b) => {
@@ -625,17 +454,13 @@ export default function VCPartnersPage() {
                       <div className="flex items-start justify-between gap-3">
                         <h3 className="text-lg font-semibold">{b.name}</h3>
                         {isSelected && (
-                          <span className="shrink-0 rounded-md bg-lime-300 px-2 py-0.5 text-xs font-bold text-black">
-                            Selected
-                          </span>
+                          <span className="shrink-0 rounded-md bg-lime-300 px-2 py-0.5 text-xs font-bold text-black">Selected</span>
                         )}
                       </div>
                       <p className="text-sm text-neutral-400 mt-1">{b.subtitle}</p>
                       <p className="text-sm text-neutral-400 mt-2">{b.description}</p>
                       <ul className="mt-3 list-disc pl-5 text-sm text-neutral-400 space-y-1">
-                        {b.features.map((f, i) => (
-                          <li key={i}>{f}</li>
-                        ))}
+                        {b.features.map((f, i) => <li key={i}>{f}</li>)}
                       </ul>
                     </button>
                   );
@@ -646,9 +471,7 @@ export default function VCPartnersPage() {
             {/* Perks */}
             <section>
               <h2 className="text-2xl font-semibold">LvlUp Applicant Exclusive Perks</h2>
-              <Label className="text-neutral-400 text-xs uppercase tracking-wide">
-                (select the options that apply)
-              </Label>
+              <Label className="text-neutral-400 text-xs uppercase tracking-wide">(select the options that apply)</Label>
 
               <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {programsCards.map((pg) => {
@@ -666,19 +489,13 @@ export default function VCPartnersPage() {
                       <div className="flex items-start justify-between gap-3">
                         <h3 className="text-lg font-semibold">{pg.name}</h3>
                         {isSelected && (
-                          <span className="shrink-0 rounded-md bg-lime-300 px-2 py-0.5 text-xs font-bold text-black">
-                            Selected
-                          </span>
+                          <span className="shrink-0 rounded-md bg-lime-300 px-2 py-0.5 text-xs font-bold text-black">Selected</span>
                         )}
                       </div>
-
                       <p className="text-sm text-neutral-400 mt-1">{pg.subtitle}</p>
-
                       {pg.perks.length > 0 && (
                         <ul className="mt-3 list-disc pl-5 text-sm text-neutral-400 space-y-1">
-                          {pg.perks.map((line, i) => (
-                            <li key={i}>{line}</li>
-                          ))}
+                          {pg.perks.map((line, i) => <li key={i}>{line}</li>)}
                         </ul>
                       )}
                     </button>
@@ -688,24 +505,13 @@ export default function VCPartnersPage() {
             </section>
           </div>
 
-          {/* ================= RIGHT: Form ================= */}
+          {/* RIGHT: Form */}
           <div className="md:col-span-5">
             <form
               ref={formRef}
-              action={submitApplicationAction} // Server Action — DO NOT set encType/method; Next does it.
-              // no onSubmit -> we drive validation+submit from the button
+              action={formAction} // <- useActionState dispatcher
               className="space-y-8 rounded-xl border border-neutral-800 bg-[#181818] p-8 shadow-lg"
             >
-              {/* hidden real submitter that points to our Server Action */}
-              <button
-                ref={hiddenSubmitRef}
-                type="submit"
-                formAction={submitApplicationAction}
-                className="hidden"
-                aria-hidden
-                tabIndex={-1}
-              />
-
               {/* Founder Contact */}
               <section>
                 <h3 className="text-lg font-semibold">Founder Contact Information</h3>
@@ -714,14 +520,14 @@ export default function VCPartnersPage() {
                     <Label className="text-neutral-400 text-xs uppercase tracking-wide">Founder First Name *</Label>
                     <Input
                       {...register("founderFirstName", { required: true })}
-                      className="mt-2 bg-black border border-neutral-700 text-white placeholder-neutral-500 focus:border-lime-300"
+                      className="mt-2 !bg-[var(--form-input-bg)] border border-neutral-700 text-white placeholder-neutral-500 focus:border-lime-300"
                     />
                   </div>
                   <div>
                     <Label className="text-neutral-400 text-xs uppercase tracking-wide">Founder Last Name *</Label>
                     <Input
                       {...register("founderLastName", { required: true })}
-                      className="mt-2 bg-black border border-neutral-700 text-white placeholder-neutral-500 focus:border-lime-300"
+                      className="mt-2 !bg-[var(--form-input-bg)] border border-neutral-700 text-white placeholder-neutral-500 focus:border-lime-300"
                     />
                   </div>
                   <div>
@@ -729,7 +535,7 @@ export default function VCPartnersPage() {
                     <Input
                       type="email"
                       {...register("founderEmail", { required: true })}
-                      className="mt-2 bg-black border border-neutral-700 text-white placeholder-neutral-500 focus:border-lime-300"
+                      className="mt-2 !bg-[var(--form-input-bg)] border border-neutral-700 text-white placeholder-neutral-500 focus:border-lime-300"
                     />
                   </div>
                   <div>
@@ -737,7 +543,7 @@ export default function VCPartnersPage() {
                     <Input
                       {...register("founderPhone", { required: true })}
                       placeholder="+1 555 123 4567"
-                      className="mt-2 bg-black border border-neutral-700 text-white placeholder-neutral-500 focus:border-lime-300"
+                      className="mt-2 !bg-[var(--form-input-bg)] border border-neutral-700 text-white placeholder-neutral-500 focus:border-lime-300"
                     />
                   </div>
                 </div>
@@ -751,7 +557,7 @@ export default function VCPartnersPage() {
                     <Label className="text-neutral-400 text-xs uppercase tracking-wide">Company Name *</Label>
                     <Input
                       {...register("companyName", { required: true })}
-                      className="mt-2 bg-black border border-neutral-700 text-white placeholder-neutral-500 focus:border-lime-300"
+                      className="mt-2 !bg-[var(--form-input-bg)] border border-neutral-700 text-white placeholder-neutral-500 focus:border-lime-300"
                     />
                   </div>
                   <div>
@@ -760,15 +566,13 @@ export default function VCPartnersPage() {
                       type="url"
                       {...register("companyWebsite", { required: true })}
                       placeholder="https://…"
-                      className="mt-2 bg-black border border-neutral-700 text-white placeholder-neutral-500 focus:border-lime-300"
+                      className="mt-2 !bg-[var(--form-input-bg)] border border-neutral-700 text-white placeholder-neutral-500 focus:border-lime-300"
                     />
                   </div>
 
                   {/* Industry: react-select multi (≤4) */}
                   <div className="sm:col-span-2">
-                    <Label className="text-neutral-400 text-xs uppercase tracking-wide">
-                      Industry (choose up to 4) *
-                    </Label>
+                    <Label className="text-neutral-400 text-xs uppercase tracking-wide">Industry (choose up to 4) *</Label>
                     <Controller
                       control={control}
                       name="industry"
@@ -798,19 +602,17 @@ export default function VCPartnersPage() {
 
                   {/* Region: shadcn single-select */}
                   <div className="sm:col-span-2">
-                    <Label className="text-neutral-400 text-xs uppercase tracking-wide">
-                      Company Location (Region) *
-                    </Label>
+                    <Label className="text-neutral-400 text-xs uppercase tracking-wide">Company Location (Region) *</Label>
                     <Controller
                       control={control}
                       name="companyRegion"
                       rules={{ required: true }}
                       render={({ field }) => (
                         <ShadSelect onValueChange={field.onChange} value={field.value}>
-                          <SelectTrigger className="mt-2 ctrl text-white">
+                          <SelectTrigger className="mt-2 !bg-[var(--form-input-bg)] border border-neutral-700 text-white focus:border-lime-300">
                             <SelectValue placeholder="Select region" />
                           </SelectTrigger>
-                          <SelectContent className="bg-[#111] border border-neutral-700 text-white">
+                          <SelectContent className="bg-[#181818] border border-neutral-700 text-white">
                             {regionOptions.map((r) => (
                               <SelectItem key={r.value} value={r.value}>
                                 {r.label}
@@ -823,15 +625,13 @@ export default function VCPartnersPage() {
                   </div>
 
                   <div className="sm:col-span-2">
-                    <Label className="text-neutral-400 text-xs uppercase tracking-wide">
-                      Elevator Pitch (300 chars) *
-                    </Label>
+                    <Label className="text-neutral-400 text-xs uppercase tracking-wide">Elevator Pitch (300 chars) *</Label>
                     <Textarea
                       rows={4}
                       maxLength={300}
                       {...register("elevatorPitch", { required: true, maxLength: 300 })}
                       placeholder="Tell us briefly about your business…"
-                      className="mt-2 bg-black border border-neutral-700 text-white placeholder-neutral-500 focus:border-lime-300"
+                      className="mt-2 !bg-[var(--form-input-bg)] border border-neutral-700 text-white placeholder-neutral-500 focus:border-lime-300"
                     />
                     <div className="mt-1 text-xs text-neutral-500">{elevatorPitch.length}/300</div>
                   </div>
@@ -845,11 +645,11 @@ export default function VCPartnersPage() {
                         {...register("pitchDeckPdf", {
                           required: true,
                           onChange: (e) => {
-                            const file = e.target.files?.[0] ?? null;
+                            const file = (e.target as HTMLInputElement).files?.[0] ?? null;
                             setSelectedFile(file);
                           },
                         })}
-                        className="w-full bg-[#181818] border border-neutral-700 text-white
+                        className="w-full !bg-[var(--form-input-bg)] border border-neutral-700 text-white
                                     file:rounded-md file:border-0 file:bg-lime-300
                                     file:px-3 file:py-2 file:text-black
                                     focus:border-lime-300 cursor-pointer pr-10"
@@ -874,7 +674,7 @@ export default function VCPartnersPage() {
                       type="url"
                       {...register("pitchDeckLink")}
                       placeholder="DocSend / Google Drive"
-                      className="mt-2 bg-black border border-neutral-700 text-white placeholder-neutral-500 focus:border-lime-300"
+                      className="mt-2 !bg-[var(--form-input-bg)] border border-neutral-700 text-white placeholder-neutral-500 focus:border-lime-300"
                     />
                   </div>
                 </div>
@@ -883,25 +683,19 @@ export default function VCPartnersPage() {
               {/* Eligibility */}
               <section className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>
-                  <Label className="text-neutral-400 text-xs uppercase tracking-wide">
-                    B2B SaaS with ≥3 months runway? *
-                  </Label>
+                  <Label className="text-neutral-400 text-xs uppercase tracking-wide">B2B SaaS with ≥3 months runway? *</Label>
                   <div className="mt-2">
                     <PillYesNo name="isB2BSaaSWithRunway" register={register} />
                   </div>
                 </div>
                 <div>
-                  <Label className="text-neutral-400 text-xs uppercase tracking-wide">
-                    Sell a physical product on your website? *
-                  </Label>
+                  <Label className="text-neutral-400 text-xs uppercase tracking-wide">Sell a physical product on your website? *</Label>
                   <div className="mt-2">
                     <PillYesNo name="sellsPhysicalProduct" register={register} />
                   </div>
                 </div>
                 <div>
-                  <Label className="text-neutral-400 text-xs uppercase tracking-wide">
-                    One or more founder above 50? *
-                  </Label>
+                  <Label className="text-neutral-400 text-xs uppercase tracking-wide">One or more founder above 50? *</Label>
                   <div className="mt-2">
                     <PillYesNo name="hasFounderOver50" register={register} />
                   </div>
@@ -913,19 +707,14 @@ export default function VCPartnersPage() {
                   </div>
                 </div>
 
-                {/* NEW questions */}
                 <div>
-                  <Label className="text-neutral-400 text-xs uppercase tracking-wide">
-                    Do you have one or more female founders? *
-                  </Label>
+                  <Label className="text-neutral-400 text-xs uppercase tracking-wide">Do you have one or more female founders? *</Label>
                   <div className="mt-2">
                     <PillYesNo name="hasFemaleFounder" register={register} />
                   </div>
                 </div>
                 <div>
-                  <Label className="text-neutral-400 text-xs uppercase tracking-wide">
-                    Are you a foreign-born founder living in the United States? *
-                  </Label>
+                  <Label className="text-neutral-400 text-xs uppercase tracking-wide">Are you a foreign-born founder living in the United States? *</Label>
                   <div className="mt-2">
                     <PillYesNo name="isForeignBornInUS" register={register} />
                   </div>
@@ -943,7 +732,7 @@ export default function VCPartnersPage() {
                       name="fundraisingStage"
                       render={({ field }) => (
                         <ShadSelect onValueChange={field.onChange} value={field.value}>
-                          <SelectTrigger className="mt-2 ctrl text-white">
+                          <SelectTrigger className="mt-2 !bg-[var(--form-input-bg)] border border-neutral-700 text-white focus:border-lime-300">
                             <SelectValue placeholder="Select stage" />
                           </SelectTrigger>
                           <SelectContent className="bg-[#111] border border-neutral-700 text-white">
@@ -963,7 +752,7 @@ export default function VCPartnersPage() {
                     <Input
                       {...register("raiseAmount", { required: true })}
                       placeholder="$1,000,000"
-                      className="mt-2 bg-black border border-neutral-700 text-white placeholder-neutral-500 focus:border-lime-300"
+                      className="mt-2 !bg-[var(--form-input-bg)] border border-neutral-700 text-white placeholder-neutral-500 focus:border-lime-300"
                     />
                   </div>
 
@@ -972,7 +761,7 @@ export default function VCPartnersPage() {
                     <Input
                       {...register("valuation", { required: true })}
                       placeholder="$10,000,000 (pre/target)"
-                      className="mt-2 bg-black border border-neutral-700 text-white placeholder-neutral-500 focus:border-lime-300"
+                      className="mt-2 !bg-[var(--form-input-bg)] border border-neutral-700 text-white placeholder-neutral-500 focus:border-lime-300"
                     />
                   </div>
 
@@ -981,7 +770,7 @@ export default function VCPartnersPage() {
                     <Input
                       {...register("mrr", { required: true })}
                       placeholder="$25,000"
-                      className="mt-2 bg-black border border-neutral-700 text-white placeholder-neutral-500 focus:border-lime-300"
+                      className="mt-2 !bg-[var(--form-input-bg)] border border-neutral-700 text-white placeholder-neutral-500 focus:border-lime-300"
                     />
                   </div>
 
@@ -990,18 +779,16 @@ export default function VCPartnersPage() {
                     <Input
                       {...register("burnRate", { required: true })}
                       placeholder="$40,000"
-                      className="mt-2 bg-black border border-neutral-700 text-white placeholder-neutral-500 focus:border-lime-300"
+                      className="mt-2 !bg-[var(--form-input-bg)] border border-neutral-700 text-white placeholder-neutral-500 focus:border-lime-300"
                     />
                   </div>
 
                   <div>
-                    <Label className="text-neutral-400 text-xs uppercase tracking-wide">
-                      Previously Raised Capital *
-                    </Label>
+                    <Label className="text-neutral-400 text-xs uppercase tracking-wide">Previously Raised Capital *</Label>
                     <Input
                       {...register("previouslyRaised", { required: true })}
                       placeholder="$500,000"
-                      className="mt-2 bg-black border border-neutral-700 text-white placeholder-neutral-500 focus:border-lime-300"
+                      className="mt-2 !bg-[var(--form-input-bg)] border border-neutral-700 text-white placeholder-neutral-500 focus:border-lime-300"
                     />
                   </div>
                 </div>
@@ -1031,17 +818,29 @@ export default function VCPartnersPage() {
                   variant="secondary"
                   className="rounded-lg border border-neutral-700 bg-transparent text-white hover:bg-neutral-900"
                   onClick={() => {
-                    reset();
+                    reset({
+                      industry: [],
+                      fundraisingStage: "",
+                      programs: [],
+                      competitions: [],
+                    });
                     setSelectedPartners([]);
                     setSelectedCompetitions([]);
                     setSelectedPrograms([]);
+                    setSelectedFile(null);
                   }}
                 >
                   Clear form
                 </Button>
 
-                {/* Visible submit that does RHF validation then native-submit to server action */}
-                <SubmitButton onClick={handleSubmitClick} disabled={formState.isSubmitting} />
+                <Button
+                  type="button"
+                  onClick={handleSubmitClick}
+                  className="rounded-lg bg-lime-300 text-black font-semibold hover:bg-lime-200 disabled:opacity-60"
+                  disabled={isPending || formState.isSubmitting}
+                >
+                  {isPending ? "Submitting..." : "Submit"}
+                </Button>
               </div>
             </form>
           </div>

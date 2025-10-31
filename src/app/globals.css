@@ -120,9 +120,14 @@
     @apply bg-background text-foreground;
   }
 }
+
+:root, .dark {
+  --sonner-success-bg: #181818;
+  --sonner-success-text: #ffffff;
+  --sonner-success-border: #404040;
+}
 /* === Glassy input surfaces (dark + light) =============================== */
-:root {
-  /* a subtle translucent surface you can reuse elsewhere */
+  /* :root {
   --surface-glass: rgba(255, 255, 255, 0.06);
   --surface-glass-strong: rgba(255, 255, 255, 0.10);
 }
@@ -131,8 +136,6 @@
   --surface-glass-strong: rgba(255, 255, 255, 0.10);
 }
 
-/* Make all form controls use the translucent surface by default. 
-   We use !important to win over any `bg-black` utility that might slip in. */
 input:not([type="checkbox"]):not([type="radio"]),
 textarea,
 select {
@@ -140,26 +143,21 @@ select {
   backdrop-filter: blur(4px);
 }
 
-/* Shadcn select trigger (the button element) */
 button[class*="SelectTrigger"],
 div[class*="select-trigger"] {
   background-color: var(--surface-glass) !important;
   backdrop-filter: blur(4px);
 }
 
-/* React-Select fallback (in case customStyles miss or class names change).
-   If you use classNamePrefix="rs" on <Select>, this becomes very reliable. */
 div[class*="control"] {
   background-color: var(--surface-glass) !important;
   backdrop-filter: blur(4px);
 }
 
-/* Pills / multi-value chips look a tad stronger */
 div[class*="multiValue"] {
   background-color: var(--surface-glass-strong) !important;
 }
 
-/* Chrome autofill (otherwise it paints yellow/black) */
 input:-webkit-autofill,
 textarea:-webkit-autofill,
 select:-webkit-autofill {
@@ -168,12 +166,11 @@ select:-webkit-autofill {
   caret-color: var(--foreground) !important;
 }
 
-/* Consistent control surface */
 .ctrl {
   background-color: rgba(255,255,255,.06);
   border-color: rgba(255,255,255,.12);
 }
 .ctrl:focus, .ctrl:focus-within {
-  border-color: #bef264; /* your lime */
+  border-color: #bef264; 
   box-shadow: 0 0 0 2px rgba(190,242,100,.25);
-}
+}   */
