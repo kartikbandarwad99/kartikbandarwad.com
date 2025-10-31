@@ -167,3 +167,13 @@ select:-webkit-autofill {
   -webkit-text-fill-color: var(--foreground) !important;
   caret-color: var(--foreground) !important;
 }
+
+/* Consistent control surface */
+.ctrl {
+  background-color: rgba(255,255,255,.06);
+  border-color: rgba(255,255,255,.12);
+}
+.ctrl:focus, .ctrl:focus-within {
+  border-color: #bef264; /* your lime */
+  box-shadow: 0 0 0 2px rgba(190,242,100,.25);
+}

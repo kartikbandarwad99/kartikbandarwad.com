@@ -807,7 +807,7 @@ export default function VCPartnersPage() {
                       rules={{ required: true }}
                       render={({ field }) => (
                         <ShadSelect onValueChange={field.onChange} value={field.value}>
-                          <SelectTrigger className="mt-2 bg-black border border-neutral-700 text-white focus:border-lime-300">
+                          <SelectTrigger className="mt-2 ctrl text-white">
                             <SelectValue placeholder="Select region" />
                           </SelectTrigger>
                           <SelectContent className="bg-[#111] border border-neutral-700 text-white">
@@ -943,7 +943,7 @@ export default function VCPartnersPage() {
                       name="fundraisingStage"
                       render={({ field }) => (
                         <ShadSelect onValueChange={field.onChange} value={field.value}>
-                          <SelectTrigger className="mt-2 bg-black border border-neutral-700 text-white focus:border-lime-300">
+                          <SelectTrigger className="mt-2 ctrl text-white">
                             <SelectValue placeholder="Select stage" />
                           </SelectTrigger>
                           <SelectContent className="bg-[#111] border border-neutral-700 text-white">
