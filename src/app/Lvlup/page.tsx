@@ -6,7 +6,6 @@ import Select, { GroupBase } from "react-select";
 
 import BackgroundFX from "@/components/BackgroundFX";
 import Navbar from "@/components/Navbar";
-
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -103,6 +102,8 @@ const partnersCards: PartnerCard[] = [
   { id: "lvlup-labs", name: "LvlUp Labs", stage: "N/A (Community platform, not a fund)", focus: "Founders-only community powered by LvlUp Ventures’ ecosystem", criteria: "Open to top-tier founders; free membership" },
   { id: "new-road", name: "New Road Capital", stage: "Growth to Expansion", cheque: "$5,000,000 – $20,000,000", focus: "Supply Chain & Logistics, Retail Technology, Marketing Technology", regions: "Mainly U.S.", criteria: "≥$1M ARR; PMF achieved" },
   { id: "incisive", name: "Incisive Ventures", stage: "Pre-Seed", cheque: "$250,000 – $750,000", focus: "B2B software; invests after MVP has been in customers’ hands ≥3 months; typical rounds $500K–$2M", criteria: "Post-revenue; product in-market with early customer validation" },
+  { id: "struck", name: "Struck Capital", stage: "Seed, Pre-Seed", focus: "B2B Enterprise SaaS; Vertical AI; Agentic AI", regions: "Global"},
+  { id: "emerging-ventures", name: "Emerging Ventures", stage: "Late Seed", cheque: "$100,000 – $500,000", focus: "Capital-efficient B2B Technology; Emerging Technologies", regions: "United States & Canada", criteria: "Live product & early traction; scalable sales; clear path to Series A"},
   { id: "connetic", name: "Connetic Ventures", stage: "Pre-Seed and Seed", cheque: "$500,000 – $1,000,000", focus: "Software, Data Analytics, FinTech, Consumer Products", regions: "North America (except Bay Area and Boston)" },
 ];
 
@@ -397,7 +398,7 @@ export default function VCPartnersPage() {
             <section>
               <h2 className="text-2xl font-semibold">VC Partners</h2>
               <Label className="text-neutral-400 text-xs uppercase tracking-wide">
-                (Select the VCs you want to apply to *)
+                (Select the VCs you want to apply to)*
               </Label>
 
               <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -425,7 +426,7 @@ export default function VCPartnersPage() {
                         {p.regions && <p><span className="text-neutral-300 font-medium">Geography:</span> {p.regions}</p>}
                         {p.stage && <p><span className="text-neutral-300 font-medium">Stage:</span> {p.stage}</p>}
                         {p.cheque && <p><span className="text-neutral-300 font-medium">Cheque:</span> {p.cheque}</p>}
-                        {p.criteria && <p><span className="text-neutral-300 font-medium">Criteria:</span> {p.criteria}</p>}
+                        {p.criteria && <p><span className="text-neutral-300 font-medium">Additional Criteria:</span> {p.criteria}</p>}
                       </div>
                     </button>
                   );
@@ -799,6 +800,12 @@ export default function VCPartnersPage() {
                 <Label className="text-neutral-400 text-xs uppercase tracking-wide">
                   Do you want to participate in other pitch competitions hosted by or in partnership with LvlUp Ventures? *
                 </Label>
+                  <span className="text-neutral-500 text-[12px]">(Subject to change)</span>
+                  {/* <p className="text-neutral-500 text-[10px] mt-1">
+                    (updated regularly)
+                  </p> */}
+
+                
                 <div className="mt-2">
                   <PillYesNo name="wantsOtherCompetitions" register={register} />
                 </div>
