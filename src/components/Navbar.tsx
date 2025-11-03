@@ -32,8 +32,8 @@ export default function Navbar({
   const [copied, setCopied] = useState(false);
 
   // TODO: replace with your real info
-  const linkedinUrl = "https://www.linkedin.com/in/your-linkedin-id";
-  const emailAddress = "youremail@example.com";
+  const linkedinUrl = "https://www.linkedin.com/in/kartik-bandarwad/";
+  const emailAddress = "kbandarwad@gmail.com";
 
   const prefix = useHashLinks ? "" : "/";
 
@@ -69,7 +69,7 @@ export default function Navbar({
               {/* <Link href={`/vc-partners`} className="hover:text-lime-300 transition">VC Partners</Link> */}
               {/* <Link href={`/network`} className="hover:text-lime-300 transition">Network</Link> */}
               <Link href={`/Lvlup`} className="hover:text-lime-300 transition">Lvlup Ventures</Link>
-              {/* <Link href={`/submit`} className="hover:text-lime-300 transition">Join the network</Link> */}
+              <Link href={`/submit`} className="hover:text-lime-300 transition">Join the network</Link>
 
 
               {/* Contact opens dialog */}
