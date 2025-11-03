@@ -67,9 +67,9 @@ export default function Navbar({
               {/* <Link href={`/about`} className="hover:text-lime-300 transition">About</Link> */}
               {/* <Link href={`/how-it-works`} className="hover:text-lime-300 transition">How It Works</Link> */}
               {/* <Link href={`/vc-partners`} className="hover:text-lime-300 transition">VC Partners</Link> */}
-              <Link href={`/network`} className="hover:text-lime-300 transition">Network</Link>
+              {/* <Link href={`/network`} className="hover:text-lime-300 transition">Network</Link> */}
               <Link href={`/Lvlup`} className="hover:text-lime-300 transition">Lvlup Ventures</Link>
-              <Link href={`/submit`} className="hover:text-lime-300 transition">Join the network</Link>
+              {/* <Link href={`/submit`} className="hover:text-lime-300 transition">Join the network</Link> */}
 
 
               {/* Contact opens dialog */}
