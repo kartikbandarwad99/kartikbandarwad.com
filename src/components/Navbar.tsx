@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Linkedin, Copy, Check } from "lucide-react";
+import { Linkedin, Copy, Check, Menu, X } from "lucide-react"; // ⬅️ added Menu, X
 
 type Props = {
   fixed?: boolean;
@@ -71,7 +71,6 @@ export default function Navbar({
               {/* <Link href={`/Lvlup`} className="hover:text-lime-300 transition">Lvlup Ventures</Link> */}
               {/* <Link href={`/submit`} className="hover:text-lime-300 transition">Join the network</Link> */}
 
-
               {/* Contact opens dialog */}
               <Dialog open={contactOpen} onOpenChange={setContactOpen}>
                 <DialogTrigger asChild>
@@ -81,59 +80,59 @@ export default function Navbar({
                   <DialogHeader>
                     <DialogTitle className="text-lime-300">Contact</DialogTitle>
                     <DialogDescription className="text-neutral-400">
-                        Reach me via LinkedIn or Email.
+                      Reach me via LinkedIn or Email.
                     </DialogDescription>
                   </DialogHeader>
 
                   <div className="space-y-4 mt-2">
                     {/* LinkedIn with label */}
                     <div>
-                        <label className="text-xs uppercase tracking-wide text-neutral-400">LinkedIn</label>
-                        <a
+                      <label className="text-xs uppercase tracking-wide text-neutral-400">LinkedIn</label>
+                      <a
                         href={linkedinUrl}
                         target="_blank"
                         rel="noreferrer"
                         className="mt-1 flex items-center justify-center gap-2 rounded-lg border border-neutral-700 bg-[#181818] px-4 py-3 hover:border-lime-300 transition"
                         aria-label="Open LinkedIn profile"
-                        >
+                      >
                         <Linkedin size={18} />
                         {/* <span>View Profile</span> */}
-                        </a>
+                      </a>
                     </div>
 
                     {/* Email read-only with copy */}
                     <div>
-                        <label className="text-xs uppercase tracking-wide text-neutral-400">Email</label>
-                        <div className="relative mt-1">
+                      <label className="text-xs uppercase tracking-wide text-neutral-400">Email</label>
+                      <div className="relative mt-1">
                         <Input
-                            readOnly
-                            value={emailAddress}
-                            className="pr-12 bg-black border-neutral-700 text-white"
+                          readOnly
+                          value={emailAddress}
+                          className="pr-12 bg-black border-neutral-700 text-white"
                         />
                         <Button
-                            type="button"
-                            onClick={handleCopyEmail}
-                            className="absolute right-1.5 top-1/2 -translate-y-1/2 h-8 px-2 rounded-md bg-neutral-800 hover:bg-neutral-700 text-white"
-                            aria-label="Copy Email Address"
+                          type="button"
+                          onClick={handleCopyEmail}
+                          className="absolute right-1.5 top-1/2 -translate-y-1/2 h-8 px-2 rounded-md bg-neutral-800 hover:bg-neutral-700 text-white"
+                          aria-label="Copy Email Address"
                         >
-                            {copied ? <Check size={16} /> : <Copy size={16} />}
+                          {copied ? <Check size={16} /> : <Copy size={16} />}
                         </Button>
-                        </div>
-                        <p className="text-xs text-neutral-500 mt-1">Click the button to copy my email.</p>
+                      </div>
+                      <p className="text-xs text-neutral-500 mt-1">Click the button to copy my email.</p>
                     </div>
                   </div>
                 </DialogContent>
               </Dialog>
             </nav>
 
-            {/* Mobile menu button */}
+            {/* Mobile menu icon button (hamburger / close) */}
             <button
               onClick={() => setOpen((v) => !v)}
-              className="md:hidden border border-neutral-700 px-3 py-2 rounded-lg text-sm text-neutral-200 hover:text-lime-300 hover:border-lime-300 transition"
+              className="md:hidden inline-flex items-center justify-center p-2 text-neutral-200 hover:text-lime-300 transition focus:outline-none"
               aria-expanded={open}
-              aria-label="Toggle menu"
+              aria-label={open ? "Close menu" : "Open menu"}
             >
-              Menu
+              {open ? <X size={22} /> : <Menu size={22} />}
             </button>
           </div>
 
