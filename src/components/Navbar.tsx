@@ -68,8 +68,8 @@ export default function Navbar({
               {/* <Link href={`/how-it-works`} className="hover:text-lime-300 transition">How It Works</Link> */}
               {/* <Link href={`/vc-partners`} className="hover:text-lime-300 transition">VC Partners</Link> */}
               {/* <Link href={`/network`} className="hover:text-lime-300 transition">Network</Link> */}
-              <Link href={`/Lvlup`} className="hover:text-lime-300 transition">Lvlup Ventures</Link>
-              <Link href={`/submit`} className="hover:text-lime-300 transition">Join the network</Link>
+              {/* <Link href={`/Lvlup`} className="hover:text-lime-300 transition">Lvlup Ventures</Link> */}
+              {/* <Link href={`/submit`} className="hover:text-lime-300 transition">Join the network</Link> */}
 
 
               {/* Contact opens dialog */}
@@ -141,11 +141,11 @@ export default function Navbar({
           {open && (
             <div className="md:hidden border-t border-neutral-800 pt-4 pb-6">
               <div className="flex flex-col gap-3 text-sm font-medium">
-                <Link href={`${prefix}#about`} onClick={() => setOpen(false)} className="hover:text-lime-300 transition">About</Link>
+                {/* <Link href={`${prefix}#about`} onClick={() => setOpen(false)} className="hover:text-lime-300 transition">About</Link>
                 <Link href={`${prefix}#how-it-works`} onClick={() => setOpen(false)} className="hover:text-lime-300 transition">How It Works</Link>
                 <Link href={`${prefix}#vc-partners`} onClick={() => setOpen(false)} className="hover:text-lime-300 transition">VC Partners</Link>
-                <Link href={`${prefix}#network`} onClick={() => setOpen(false)} className="hover:text-lime-300 transition">Network</Link>
-
+                <Link href={`${prefix}#network`} onClick={() => setOpen(false)} className="hover:text-lime-300 transition">Network</Link> */}
+                {/* <Link href={`/Lvlup`} className="hover:text-lime-300 transition">Lvlup Ventures</Link> */}
                 {/* Contact opens same dialog; also close dropdown */}
                 <button
                   className="text-left hover:text-lime-300 transition"
