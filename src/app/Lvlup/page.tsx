@@ -157,6 +157,16 @@ const regionOptions = [
 
 const stageSelect = ["Bridge Round","Pre-Seed", "Seed","Seed Extension/Seed+", "Series A", "Series B","Series C"];
 
+// US states (basic list)
+const US_STATES = [
+  "Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut","Delaware","Florida","Georgia",
+  "Hawaii","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky","Louisiana","Maine","Maryland",
+  "Massachusetts","Michigan","Minnesota","Mississippi","Missouri","Montana","Nebraska","Nevada","New Hampshire",
+  "New Jersey","New Mexico","New York","North Carolina","North Dakota","Ohio","Oklahoma","Oregon","Pennsylvania",
+  "Rhode Island","South Carolina","South Dakota","Tennessee","Texas","Utah","Vermont","Virginia","Washington",
+  "West Virginia","Wisconsin","Wyoming",
+];
+
 type YesNo = "yes" | "no";
 type FormValues = {
   founderFirstName: string;
@@ -168,6 +178,7 @@ type FormValues = {
   companyWebsite: string;
   industry: string[];
   companyRegion: string;
+  companyState?: string; // required only if region is United States
   elevatorPitch: string;
   pitchDeckPdf?: FileList;
   pitchDeckLink?: string;
@@ -250,20 +261,54 @@ export default function VCPartnersPage() {
     getValues,
     trigger,
     formState,
+    setFocus,
   } = useForm<FormValues>({
     defaultValues: {
       industry: [],
-      fundraisingStage: "Seed",
+      fundraisingStage: "", // ← empty by default
       programs: [],
       competitions: [],
     },
+    shouldUseNativeValidation: true,
   });
+
+  // Friendly labels for errors/toast
+  const FIELD_LABEL: Record<keyof FormValues, string> = {
+    founderFirstName: "Founder First Name",
+    founderLastName: "Founder Last Name",
+    founderEmail: "Main Founder Email",
+    founderPhone: "Founder Phone Number",
+    companyName: "Company Name",
+    companyWebsite: "Company Website",
+    industry: "Industry",
+    companyRegion: "Company Location (Region)",
+    companyState: "State",
+    elevatorPitch: "Elevator Pitch",
+    pitchDeckPdf: "Pitch Deck (PDF)",
+    pitchDeckLink: "Pitch Deck (Link)",
+    isB2BSaaSWithRunway: "B2B SaaS with ≥3 months runway",
+    sellsPhysicalProduct: "Sell a physical product",
+    hasFounderOver50: "Founder above 50",
+    hasBlackFounder: "Black founder",
+    hasFemaleFounder: "Female founder",
+    isForeignBornInUS: "Foreign-born founder in the U.S.",
+    fundraisingStage: "Fundraising Stage",
+    raiseAmount: "Raise Amount",
+    valuation: "Valuation",
+    mrr: "Company MRR",
+    burnRate: "Company Burn Rate",
+    previouslyRaised: "Previously Raised Capital",
+    wantsOtherCompetitions: "Other Pitch Competitions",
+    programs: "Programs",
+    competitions: "Competitions",
+  };
 
   // bind card selections into form values (for submission/clear)
   useEffect(() => setValue("competitions", selectedCompetitions), [selectedCompetitions, setValue]);
   useEffect(() => setValue("programs", selectedPrograms), [selectedPrograms, setValue]);
 
   const elevatorPitch = watch("elevatorPitch") || "";
+  const region = watch("companyRegion");
 
   const formRef = useRef<HTMLFormElement | null>(null);
 
@@ -289,6 +334,7 @@ export default function VCPartnersPage() {
         companyWebsite: "",
         industry: [],
         companyRegion: "",
+        companyState: "",
         elevatorPitch: "",
         pitchDeckPdf: undefined,
         pitchDeckLink: "",
@@ -322,8 +368,44 @@ export default function VCPartnersPage() {
   }, [submitState, reset]);
 
   const handleSubmitClick = async () => {
-    const isValid = await trigger();
-    if (!isValid || !formRef.current) return;
+    // Validate form fields first
+    const isValid = await trigger(undefined, { shouldFocus: true });
+
+    // Handle RHF field errors
+    if (!isValid) {
+      const fields = Object.keys(formState.errors) as (keyof FormValues)[];
+      if (fields.length) {
+        const first = fields[0];
+        const firstError = formState.errors[first];
+        setFocus(first as any);
+        const msg =
+          (firstError?.message as string | undefined) ||
+          `Please fill the required field: ${FIELD_LABEL[first] ?? String(first)}`;
+        toast.error(msg);
+      } else {
+        toast.error("Please complete the required fields.");
+      }
+      return;
+    }
+
+    // Enforce VC partners selection (at least 1)
+    if (selectedPartners.length === 0) {
+      toast.error("Please select at least one VC partner.");
+      // focus roughly the section by scrolling to the cards header
+      const heading = document.querySelector("h2:text-is('VC Partners')") as HTMLElement | null;
+      if (heading?.scrollIntoView) heading.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
+
+    // If United States is selected, ensure State is provided (defensive check in case user skipped)
+    const vCheck = getValues();
+    if (vCheck.companyRegion === "United States" && !vCheck.companyState) {
+      setFocus("companyState" as any);
+      toast.error("Please select a state.");
+      return;
+    }
+
+    if (!formRef.current) return;
 
     const v = getValues();
     const payload = {
@@ -341,6 +423,7 @@ export default function VCPartnersPage() {
         website: v.companyWebsite,
         industries: v.industry,
         region: v.companyRegion,
+        state: v.companyState || null,
         elevatorPitch: v.elevatorPitch,
         deckLink: v.pitchDeckLink || null,
       },
@@ -535,7 +618,14 @@ export default function VCPartnersPage() {
                     <Label className="text-neutral-400 text-xs uppercase tracking-wide">Main Founder Email *</Label>
                     <Input
                       type="email"
-                      {...register("founderEmail", { required: true })}
+                      {...register("founderEmail", {
+                        required: "Email is required",
+                        pattern: {
+                          value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                          message: "Enter a valid email address",
+                        },
+                      })}
+                      placeholder="you@startup.com"
                       className="mt-2 !bg-[var(--form-input-bg)] border border-neutral-700 text-white placeholder-neutral-500 focus:border-lime-300"
                     />
                   </div>
@@ -562,11 +652,26 @@ export default function VCPartnersPage() {
                     />
                   </div>
                   <div>
-                    <Label className="text-neutral-400 text-xs uppercase tracking-wide">Company Website *</Label>
+                    <Label className="text-neutral-400 text-xs uppercase tracking-wide">
+                      Company Website *
+                    </Label>
+                    <p className="text-[11px] text-neutral-500 mt-1">
+                      Enter a URL starting with <span className="text-neutral-300">https://</span> or <span className="text-neutral-300">www.</span>
+                    </p>
                     <Input
-                      type="url"
-                      {...register("companyWebsite", { required: true })}
-                      placeholder="https://…"
+                      type="text"
+                      {...register("companyWebsite", {
+                        required: "Website is required",
+                        validate: (value) => {
+                          // allow ONLY https:// or www.
+                          const validPattern = /^(https:\/\/|www\.)[^\s]+$/i;
+                          return (
+                            validPattern.test(value) ||
+                            "Website must start with https:// or www."
+                          );
+                        },
+                      })}
+                      placeholder="https://startup.com or www.startup.com"
                       className="mt-2 !bg-[var(--form-input-bg)] border border-neutral-700 text-white placeholder-neutral-500 focus:border-lime-300"
                     />
                   </div>
@@ -609,7 +714,11 @@ export default function VCPartnersPage() {
                       name="companyRegion"
                       rules={{ required: true }}
                       render={({ field }) => (
-                        <ShadSelect onValueChange={field.onChange} value={field.value}>
+                        <ShadSelect onValueChange={(val) => {
+                          field.onChange(val);
+                          // clear state if region changes away from US
+                          if (val !== "United States") setValue("companyState", "");
+                        }} value={field.value}>
                           <SelectTrigger className="mt-2 !bg-[var(--form-input-bg)] border border-neutral-700 text-white focus:border-lime-300">
                             <SelectValue placeholder="Select region" />
                           </SelectTrigger>
@@ -624,6 +733,34 @@ export default function VCPartnersPage() {
                       )}
                     />
                   </div>
+
+                  {/* Conditional: State when US */}
+                  {region === "United States" && (
+                    <div className="sm:col-span-2">
+                      <Label className="text-neutral-400 text-xs uppercase tracking-wide">State *</Label>
+                      <Controller
+                        control={control}
+                        name="companyState"
+                        rules={{
+                          validate: (v) => region !== "United States" || !!v || "Please select a state",
+                        }}
+                        render={({ field }) => (
+                          <ShadSelect onValueChange={field.onChange} value={field.value}>
+                            <SelectTrigger className="mt-2 !bg-[var(--form-input-bg)] border border-neutral-700 text-white focus:border-lime-300">
+                              <SelectValue placeholder="Select state" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-[#181818] border border-neutral-700 text-white max-h-72">
+                              {US_STATES.map((s) => (
+                                <SelectItem key={s} value={s}>
+                                  {s}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </ShadSelect>
+                        )}
+                      />
+                    </div>
+                  )}
 
                   <div className="sm:col-span-2">
                     <Label className="text-neutral-400 text-xs uppercase tracking-wide">Elevator Pitch (300 chars) *</Label>
@@ -731,6 +868,7 @@ export default function VCPartnersPage() {
                     <Controller
                       control={control}
                       name="fundraisingStage"
+                      rules={{ required: "Fundraising stage is required" }}
                       render={({ field }) => (
                         <ShadSelect onValueChange={field.onChange} value={field.value}>
                           <SelectTrigger className="mt-2 !bg-[var(--form-input-bg)] border border-neutral-700 text-white focus:border-lime-300">
@@ -751,7 +889,10 @@ export default function VCPartnersPage() {
                   <div>
                     <Label className="text-neutral-400 text-xs uppercase tracking-wide">Raise Amount *</Label>
                     <Input
-                      {...register("raiseAmount", { required: true })}
+                      {...register("raiseAmount", {
+                            required: "Raise amount is required",
+                            validate: v => !isNaN(Number(v)) || "Enter a valid number",
+                      })}
                       placeholder="$1,000,000"
                       className="mt-2 !bg-[var(--form-input-bg)] border border-neutral-700 text-white placeholder-neutral-500 focus:border-lime-300"
                     />
@@ -760,8 +901,11 @@ export default function VCPartnersPage() {
                   <div>
                     <Label className="text-neutral-400 text-xs uppercase tracking-wide">Valuation *</Label>
                     <Input
-                      {...register("valuation", { required: true })}
-                      placeholder="$10,000,000 (pre/target)"
+                      {...register("valuation", {
+                            required: "Valuation is required",
+                            validate: v => !isNaN(Number(v)) || "Enter a valid number",
+                      })}
+                      placeholder="$10,000,000"
                       className="mt-2 !bg-[var(--form-input-bg)] border border-neutral-700 text-white placeholder-neutral-500 focus:border-lime-300"
                     />
                   </div>
@@ -769,7 +913,10 @@ export default function VCPartnersPage() {
                   <div>
                     <Label className="text-neutral-400 text-xs uppercase tracking-wide">Company MRR *</Label>
                     <Input
-                      {...register("mrr", { required: true })}
+                      {...register("mrr", {
+                            required: "MRR is required",
+                            validate: v => !isNaN(Number(v)) || "Enter a valid number",
+                      })}
                       placeholder="$25,000"
                       className="mt-2 !bg-[var(--form-input-bg)] border border-neutral-700 text-white placeholder-neutral-500 focus:border-lime-300"
                     />
@@ -778,7 +925,10 @@ export default function VCPartnersPage() {
                   <div>
                     <Label className="text-neutral-400 text-xs uppercase tracking-wide">Company Burn Rate *</Label>
                     <Input
-                      {...register("burnRate", { required: true })}
+                      {...register("burnRate", {
+                            required: "Burn rate is required",
+                            validate: v => !isNaN(Number(v)) || "Enter a valid number",
+                      })}
                       placeholder="$40,000"
                       className="mt-2 !bg-[var(--form-input-bg)] border border-neutral-700 text-white placeholder-neutral-500 focus:border-lime-300"
                     />
@@ -787,7 +937,10 @@ export default function VCPartnersPage() {
                   <div>
                     <Label className="text-neutral-400 text-xs uppercase tracking-wide">Previously Raised Capital *</Label>
                     <Input
-                      {...register("previouslyRaised", { required: true })}
+                      {...register("previouslyRaised", {
+                            required: "Previous funding amount required",
+                            validate: v => !isNaN(Number(v)) || "Enter a valid number",
+                      })}
                       placeholder="$500,000"
                       className="mt-2 !bg-[var(--form-input-bg)] border border-neutral-700 text-white placeholder-neutral-500 focus:border-lime-300"
                     />
@@ -801,10 +954,6 @@ export default function VCPartnersPage() {
                   Do you want to participate in other pitch competitions hosted by or in partnership with LvlUp Ventures? *
                 </Label>
                   <span className="text-neutral-500 text-[12px]">(Subject to change)</span>
-                  {/* <p className="text-neutral-500 text-[10px] mt-1">
-                    (updated regularly)
-                  </p> */}
-
                 
                 <div className="mt-2">
                   <PillYesNo name="wantsOtherCompetitions" register={register} />
