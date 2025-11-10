@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Linkedin, Copy, Check, Menu, X } from "lucide-react"; // ⬅️ added Menu, X
+import { Linkedin, Copy, Check, Menu, X } from "lucide-react";
 
 type Props = {
   fixed?: boolean;
@@ -30,6 +30,9 @@ export default function Navbar({
   const [open, setOpen] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  // Calendly URL
+  const calendlyUrl = "https://calendly.com/kbandarwad";
 
   // TODO: replace with your real info
   const linkedinUrl = "https://www.linkedin.com/in/kartik-bandarwad/";
@@ -51,6 +54,14 @@ export default function Navbar({
     }
   };
 
+  const openCalendlyPopup = () => {
+    // @ts-ignore
+    if (window.Calendly) {
+      // @ts-ignore
+      window.Calendly.initPopupWidget({ url: calendlyUrl });
+    }
+  };
+
   return (
     <>
       <header className={headerClasses}>
@@ -64,14 +75,7 @@ export default function Navbar({
 
             {/* Desktop nav */}
             <nav className="hidden md:flex gap-8 text-sm font-medium">
-              {/* <Link href={`/about`} className="hover:text-lime-300 transition">About</Link> */}
-              {/* <Link href={`/how-it-works`} className="hover:text-lime-300 transition">How It Works</Link> */}
-              {/* <Link href={`/vc-partners`} className="hover:text-lime-300 transition">VC Partners</Link> */}
-              {/* <Link href={`/network`} className="hover:text-lime-300 transition">Network</Link> */}
-              {/* <Link href={`/Lvlup`} className="hover:text-lime-300 transition">Lvlup Ventures</Link> */}
-              {/* <Link href={`/submit`} className="hover:text-lime-300 transition">Join the network</Link> */}
-
-              {/* Contact opens dialog */}
+              {/* Contact Dialog */}
               <Dialog open={contactOpen} onOpenChange={setContactOpen}>
                 <DialogTrigger asChild>
                   <button className="hover:text-lime-300 transition">Contact</button>
@@ -85,7 +89,6 @@ export default function Navbar({
                   </DialogHeader>
 
                   <div className="space-y-4 mt-2">
-                    {/* LinkedIn with label */}
                     <div>
                       <label className="text-xs uppercase tracking-wide text-neutral-400">LinkedIn</label>
                       <a
@@ -96,11 +99,9 @@ export default function Navbar({
                         aria-label="Open LinkedIn profile"
                       >
                         <Linkedin size={18} />
-                        {/* <span>View Profile</span> */}
                       </a>
                     </div>
 
-                    {/* Email read-only with copy */}
                     <div>
                       <label className="text-xs uppercase tracking-wide text-neutral-400">Email</label>
                       <div className="relative mt-1">
@@ -113,7 +114,6 @@ export default function Navbar({
                           type="button"
                           onClick={handleCopyEmail}
                           className="absolute right-1.5 top-1/2 -translate-y-1/2 h-8 px-2 rounded-md bg-neutral-800 hover:bg-neutral-700 text-white"
-                          aria-label="Copy Email Address"
                         >
                           {copied ? <Check size={16} /> : <Copy size={16} />}
                         </Button>
@@ -123,12 +123,20 @@ export default function Navbar({
                   </div>
                 </DialogContent>
               </Dialog>
+
+              {/* NEW: Calendly popup trigger */}
+              <button
+                onClick={openCalendlyPopup}
+                className="hover:text-lime-300 transition"
+              >
+                Book a call
+              </button>
             </nav>
 
-            {/* Mobile menu icon button (hamburger / close) */}
+            {/* Mobile menu button */}
             <button
               onClick={() => setOpen((v) => !v)}
-              className="md:hidden inline-flex items-center justify-center p-2 text-neutral-200 hover:text-lime-300 transition focus:outline-none"
+              className="md:hidden inline-flex items-center justify-center p-2 text-neutral-200 hover:text-lime-300 transition"
               aria-expanded={open}
               aria-label={open ? "Close menu" : "Open menu"}
             >
@@ -140,12 +148,6 @@ export default function Navbar({
           {open && (
             <div className="md:hidden border-t border-neutral-800 pt-4 pb-6">
               <div className="flex flex-col gap-3 text-sm font-medium">
-                {/* <Link href={`${prefix}#about`} onClick={() => setOpen(false)} className="hover:text-lime-300 transition">About</Link>
-                <Link href={`${prefix}#how-it-works`} onClick={() => setOpen(false)} className="hover:text-lime-300 transition">How It Works</Link>
-                <Link href={`${prefix}#vc-partners`} onClick={() => setOpen(false)} className="hover:text-lime-300 transition">VC Partners</Link>
-                <Link href={`${prefix}#network`} onClick={() => setOpen(false)} className="hover:text-lime-300 transition">Network</Link> */}
-                {/* <Link href={`/Lvlup`} className="hover:text-lime-300 transition">Lvlup Ventures</Link> */}
-                {/* Contact opens same dialog; also close dropdown */}
                 <button
                   className="text-left hover:text-lime-300 transition"
                   onClick={() => {
@@ -154,6 +156,16 @@ export default function Navbar({
                   }}
                 >
                   Contact
+                </button>
+
+                <button
+                  className="text-left hover:text-lime-300 transition"
+                  onClick={() => {
+                    setOpen(false);
+                    openCalendlyPopup();
+                  }}
+                >
+                  Book a call
                 </button>
               </div>
             </div>
