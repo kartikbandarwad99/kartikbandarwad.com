@@ -105,6 +105,7 @@ const partnersCards: PartnerCard[] = [
   { id: "struck", name: "Struck Capital", stage: "Seed, Pre-Seed", focus: "B2B Enterprise SaaS; Vertical AI; Agentic AI", regions: "Global"},
   { id: "emerging-ventures", name: "Emerging Ventures", stage: "Late Seed", cheque: "$100,000 – $500,000", focus: "Capital-efficient B2B Technology; Emerging Technologies", regions: "United States & Canada", criteria: "Live product & early traction; scalable sales; clear path to Series A"},
   { id: "connetic", name: "Connetic Ventures", stage: "Pre-Seed and Seed", cheque: "$500,000 – $1,000,000", focus: "Software, Data Analytics, FinTech, Consumer Products", regions: "North America (except Bay Area and Boston)" },
+  { id: "corner-capital", name: "Corner Capital", stage: "Pre-Seed to Series A", focus: "Industry-agnostic early-stage tech companies", regions: "United States & Israel"},
 ];
 
 // ========= LvlUp Ventures Bootcamps =========
