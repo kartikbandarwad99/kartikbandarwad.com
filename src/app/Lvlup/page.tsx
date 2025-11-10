@@ -658,9 +658,9 @@ export default function VCPartnersPage() {
                     <Label className="text-neutral-400 text-xs uppercase tracking-wide">
                       Company Website *
                     </Label>
-                    <p className="text-[11px] text-neutral-500 mt-1">
+                    {/* <p className="text-[11px] text-neutral-500 mt-1">
                       Enter a URL starting with <span className="text-neutral-300">https://</span> or <span className="text-neutral-300">www.</span>
-                    </p>
+                    </p> */}
                     <Input
                       type="text"
                       {...register("companyWebsite", {
@@ -674,7 +674,7 @@ export default function VCPartnersPage() {
                           );
                         },
                       })}
-                      placeholder="https://startup.com or www.startup.com"
+                      placeholder="https:// or www"
                       className="mt-2 !bg-[var(--form-input-bg)] border border-neutral-700 text-white placeholder-neutral-500 focus:border-lime-300"
                     />
                   </div>
@@ -860,12 +860,12 @@ export default function VCPartnersPage() {
                     <PillYesNo name="isForeignBornInUS" register={register} />
                   </div>
                 </div>
-                <div>
+                {/* <div>
                   <Label className="text-neutral-400 text-xs uppercase tracking-wide">Are you a incorporated? *</Label>
                   <div className="mt-2">
                     <PillYesNo name="isForeignBornInUS" register={register} />
                   </div>
-                </div>
+                </div> */}
               </section>
 
               {/* Financials */}
