@@ -189,6 +189,7 @@ type FormValues = {
   hasBlackFounder: YesNo;
   hasFemaleFounder: YesNo;
   isForeignBornInUS: YesNo;
+  // isIncorporated: YesNo;
 
   fundraisingStage: string;
   raiseAmount: string;
@@ -292,6 +293,7 @@ export default function VCPartnersPage() {
     hasBlackFounder: "Black founder",
     hasFemaleFounder: "Female founder",
     isForeignBornInUS: "Foreign-born founder in the U.S.",
+    // isIncorporated: "Incorporated Status",
     fundraisingStage: "Fundraising Stage",
     raiseAmount: "Raise Amount",
     valuation: "Valuation",
@@ -629,14 +631,14 @@ export default function VCPartnersPage() {
                       className="mt-2 !bg-[var(--form-input-bg)] border border-neutral-700 text-white placeholder-neutral-500 focus:border-lime-300"
                     />
                   </div>
-                  <div>
+                  {/* <div>
                     <Label className="text-neutral-400 text-xs uppercase tracking-wide">Founder Phone Number *</Label>
                     <Input
                       {...register("founderPhone", { required: true })}
                       placeholder="+1 555 123 4567"
                       className="mt-2 !bg-[var(--form-input-bg)] border border-neutral-700 text-white placeholder-neutral-500 focus:border-lime-300"
                     />
-                  </div>
+                  </div> */}
                 </div>
               </section>
 
@@ -853,6 +855,12 @@ export default function VCPartnersPage() {
                 </div>
                 <div>
                   <Label className="text-neutral-400 text-xs uppercase tracking-wide">Are you a foreign-born founder living in the United States? *</Label>
+                  <div className="mt-2">
+                    <PillYesNo name="isForeignBornInUS" register={register} />
+                  </div>
+                </div>
+                <div>
+                  <Label className="text-neutral-400 text-xs uppercase tracking-wide">Are you a incorporated? *</Label>
                   <div className="mt-2">
                     <PillYesNo name="isForeignBornInUS" register={register} />
                   </div>

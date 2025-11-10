@@ -32,7 +32,7 @@ export default function Navbar({
   const [copied, setCopied] = useState(false);
 
   // Calendly URL
-  const calendlyUrl = "https://calendly.com/kbandarwad";
+  const calendlyUrl = "https://calendly.com/kbandarwad/30min";
 
   // TODO: replace with your real info
   const linkedinUrl = "https://www.linkedin.com/in/kartik-bandarwad/";
