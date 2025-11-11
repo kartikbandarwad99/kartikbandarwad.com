@@ -83,6 +83,8 @@ export async function submitApplicationAction(
         company_website: payload.company.website ?? null,
         company_industries: payload.company.industries ?? null,
         company_region: payload.company.region ?? null,
+        company_state: payload.company.state ?? null,   // 👈 ADD THIS LINE
+
         elevator_pitch: payload.company.elevatorPitch ?? null,
         deck_link: payload.company.deckLink ?? null,
 
