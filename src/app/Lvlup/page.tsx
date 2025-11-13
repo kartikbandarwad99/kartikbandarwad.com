@@ -556,7 +556,7 @@ export default function VCPartnersPage() {
             </section>
 
             {/* Perks */}
-            <section>
+            {/* <section>
               <h2 className="text-2xl font-semibold">LvlUp Applicant Exclusive Perks</h2>
               <Label className="text-neutral-400 text-xs uppercase tracking-wide">(select the options that apply)</Label>
 
@@ -589,7 +589,7 @@ export default function VCPartnersPage() {
                   );
                 })}
               </div>
-            </section>
+            </section> */}
           </div>
 
           {/* RIGHT: Form */}
