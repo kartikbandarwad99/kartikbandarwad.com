@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Linkedin, Copy, Check, Menu, X } from "lucide-react";
+import { Linkedin, Copy, Check, Menu, X, ChevronDown } from "lucide-react";
 
 type Props = {
   fixed?: boolean;
@@ -30,11 +30,9 @@ export default function Navbar({
   const [open, setOpen] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [applyOpen, setApplyOpen] = useState(false);
 
-  // Calendly URL
   const calendlyUrl = "https://calendly.com/kbandarwad/30min";
-
-  // TODO: replace with your real info
   const linkedinUrl = "https://www.linkedin.com/in/kartik-bandarwad/";
   const emailAddress = "kbandarwad@gmail.com";
 
@@ -74,7 +72,43 @@ export default function Navbar({
             </Link>
 
             {/* Desktop nav */}
-            <nav className="hidden md:flex gap-8 text-sm font-medium">
+            <nav className="hidden md:flex gap-8 text-sm font-medium items-center">
+              {/* Apply dropdown */}
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setApplyOpen((v) => !v)}
+                  className="inline-flex items-center gap-1 hover:text-lime-300 transition"
+                  aria-haspopup="menu"
+                  aria-expanded={applyOpen}
+                >
+                  Apply
+                  <ChevronDown size={14} className="mt-[1px]" />
+                </button>
+
+                {applyOpen && (
+                  <div
+                    className="absolute right-0 mt-2 w-64 rounded-lg border border-neutral-800 bg-[#181818] shadow-lg py-2 z-50"
+                    onMouseLeave={() => setApplyOpen(false)}
+                  >
+                    <Link
+                      href="/Lvlup"
+                      className="block px-4 py-2 text-sm text-neutral-200 hover:bg-[#222] hover:text-lime-300 transition"
+                      onClick={() => setApplyOpen(false)}
+                    >
+                      Apply to LvlUp & partner funds
+                    </Link>
+                    <Link
+                      href="/submit"
+                      className="block px-4 py-2 text-sm text-neutral-200 hover:bg-[#222] hover:text-lime-300 transition"
+                      onClick={() => setApplyOpen(false)}
+                    >
+                      Share with external investors
+                    </Link>
+                  </div>
+                )}
+              </div>
+
               {/* Contact Dialog */}
               <Dialog open={contactOpen} onOpenChange={setContactOpen}>
                 <DialogTrigger asChild>
@@ -124,7 +158,7 @@ export default function Navbar({
                 </DialogContent>
               </Dialog>
 
-              {/* NEW: Calendly popup trigger */}
+              {/* Calendly popup trigger */}
               <button
                 onClick={openCalendlyPopup}
                 className="hover:text-lime-300 transition"
@@ -148,6 +182,22 @@ export default function Navbar({
           {open && (
             <div className="md:hidden border-t border-neutral-800 pt-4 pb-6">
               <div className="flex flex-col gap-3 text-sm font-medium">
+                <Link
+                  href="/lvlup"
+                  className="text-left hover:text-lime-300 transition"
+                  onClick={() => setOpen(false)}
+                >
+                  Apply to LvlUp & partner funds
+                </Link>
+
+                <Link
+                  href="/submit"
+                  className="text-left hover:text-lime-300 transition"
+                  onClick={() => setOpen(false)}
+                >
+                  Share with external investors
+                </Link>
+
                 <button
                   className="text-left hover:text-lime-300 transition"
                   onClick={() => {
