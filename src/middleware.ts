@@ -20,16 +20,16 @@ export function middleware(req: NextRequest) {
   // 1) Root: send "/" -> "/lvlup"
   if (pathname === "/") {
     const url = req.nextUrl.clone();
-    url.pathname = "/lvlup"; // <— make sure your route folder is "lvlup"
+    url.pathname = "/Lvlup"; // <— make sure your route folder is "lvlup"
     url.search = search;
     return NextResponse.redirect(url);
   }
 
   // 2) Only allow /lvlup and /submit.
   // Any other path (e.g. /about, /random) -> redirect to /lvlup
-  if (pathname !== "/lvlup" && pathname !== "/submit") {
+  if (pathname !== "/Lvlup" && pathname !== "/submit") {
     const url = req.nextUrl.clone();
-    url.pathname = "/lvlup";
+    url.pathname = "/Lvlup";
     url.search = search;
     return NextResponse.redirect(url);
   }
