@@ -2,7 +2,6 @@
 
 import { headers } from "next/headers";
 import { z } from "zod";
-import { randomUUID } from "crypto";
 import { supabaseServer } from "@/utils/supabase/serverClient";
 import { validateCsrfToken } from "@/utils/security/csrf";
 
@@ -129,13 +128,27 @@ export async function submitEntity(formData: FormData) {
   let pitchDeckFileUrl: string | undefined;
 
   if (pitchDeckFile && pitchDeckFile.size > 0) {
-    const ext = pitchDeckFile.name.split(".").pop() || "pdf";
-    const path = `pitch-decks/${randomUUID()}.${ext}`;
+    const arrayBuffer = await pitchDeckFile.arrayBuffer();
+    const bytes = new Uint8Array(arrayBuffer);
+    const ext = (pitchDeckFile.name.split(".").pop() || "pdf").toLowerCase();
+
+    const emailSafe = (formData.get("founderemail")?.toString() || "anon")
+      .toLowerCase()
+      .replace(/[^a-z0-9@._-]/g, "_");
+
+    const companySafe = (formData.get("companyName")?.toString() || "startup")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "_");
+
+    // YYYY-MM-DD
+    const date = new Date().toISOString().split("T")[0];
+    const fileName = `${companySafe}_pitch_deck_${date}.${ext}`;
+    const objectName = `${emailSafe}/${fileName}`;
 
     const { error: uploadError } = await supabase.storage
       .from("founder-decks") // ensure this bucket exists
-      .upload(path, pitchDeckFile, {
-        contentType: "application/pdf",
+      .upload(objectName, bytes, {
+        contentType: pitchDeckFile.type || "application/pdf",
         upsert: false,
       });
 
@@ -144,7 +157,7 @@ export async function submitEntity(formData: FormData) {
     } else {
       const { data } = supabase.storage
         .from("founder-decks")
-        .getPublicUrl(path);
+        .getPublicUrl(objectName);
       pitchDeckFileUrl = data.publicUrl;
     }
   }
