@@ -63,7 +63,7 @@ export async function submitApplicationAction(
     }
 
     // ------------------------------
-    // 2) Insert DB row in public.applications
+    // 2) Helper for numeric fields
     // ------------------------------
     const toNum = (v: unknown) => {
       if (v === null || v === undefined || v === "") return null;
@@ -71,6 +71,13 @@ export async function submitApplicationAction(
       return Number.isFinite(n) ? n : null;
     };
 
+    // NEW: co-founder flag from payload
+    const hasCoFounderRaw = payload?.founder?.hasCoFounder as "yes" | "no" | undefined;
+    const hasCoFounder = hasCoFounderRaw === "yes";
+
+    // ------------------------------
+    // 3) Insert DB row in public.applications
+    // ------------------------------
     const { error: insErr } = await supabase
       .from("applications")
       .insert({
@@ -79,11 +86,17 @@ export async function submitApplicationAction(
         founder_email: payload.founder.email ?? null,
         founder_phone: payload.founder.phone ?? null,
 
+        // NEW: co-founder fields
+        has_cofounder: hasCoFounder,
+        cofounder_first_name: hasCoFounder ? payload.founder.cofounderFirstName ?? null : null,
+        cofounder_last_name: hasCoFounder ? payload.founder.cofounderLastName ?? null : null,
+        cofounder_email: hasCoFounder ? payload.founder.cofounderEmail ?? null : null,
+
         company_name: payload.company.name ?? null,
         company_website: payload.company.website ?? null,
         company_industries: payload.company.industries ?? null,
         company_region: payload.company.region ?? null,
-        company_state: payload.company.state ?? null,   // 👈 ADD THIS LINE
+        company_state: payload.company.state ?? null,
 
         elevator_pitch: payload.company.elevatorPitch ?? null,
         deck_link: payload.company.deckLink ?? null,
@@ -108,6 +121,9 @@ export async function submitApplicationAction(
         mrr: toNum(payload.financials.mrr),
         burn_rate: toNum(payload.financials.burnRate),
         previously_raised: toNum(payload.financials.previouslyRaised),
+
+        // NEW: runway in months
+        runway_months: toNum(payload.financials.runwayMonths),
       })
       .single();
 
@@ -116,7 +132,8 @@ export async function submitApplicationAction(
     }
 
     (await cookies()).set("form:submitted", "1", { path: "/", maxAge: 60 });
-    revalidatePath("/");
+    // If your main page is /Lvlup you can switch this, but leaving as-is if it's working:
+    revalidatePath("/Lvlup");
 
     return { ok: true, message: "Application submitted successfully." };
   } catch (e: any) {

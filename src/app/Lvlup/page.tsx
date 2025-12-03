@@ -175,6 +175,12 @@ type FormValues = {
   founderEmail: string;
   founderPhone: string;
 
+  // NEW: co-founder fields
+  hasCoFounder: YesNo;
+  cofounderFirstName: string;
+  cofounderLastName: string;
+  cofounderEmail: string;
+
   companyName: string;
   companyWebsite: string;
   industry: string[];
@@ -198,6 +204,7 @@ type FormValues = {
   mrr: string;
   burnRate: string;
   previouslyRaised: string;
+  runwayMonths: string; // NEW: runway months
   wantsOtherCompetitions: YesNo;
 
   programs: string[];
@@ -280,6 +287,12 @@ export default function VCPartnersPage() {
     founderLastName: "Founder Last Name",
     founderEmail: "Main Founder Email",
     founderPhone: "Founder Phone Number",
+
+    hasCoFounder: "Do you have a Co-Founder?",
+    cofounderFirstName: "Co-Founder First Name",
+    cofounderLastName: "Co-Founder Last Name",
+    cofounderEmail: "Co-Founder Email",
+
     companyName: "Company Name",
     companyWebsite: "Company Website",
     industry: "Industry",
@@ -301,6 +314,7 @@ export default function VCPartnersPage() {
     mrr: "Company MRR",
     burnRate: "Company Burn Rate",
     previouslyRaised: "Previously Raised Capital",
+    runwayMonths: "Runway (months)",
     wantsOtherCompetitions: "Other Pitch Competitions",
     programs: "Programs",
     competitions: "Competitions",
@@ -312,6 +326,7 @@ export default function VCPartnersPage() {
 
   const elevatorPitch = watch("elevatorPitch") || "";
   const region = watch("companyRegion");
+  const hasCoFounder = watch("hasCoFounder");
 
   const formRef = useRef<HTMLFormElement | null>(null);
 
@@ -333,6 +348,10 @@ export default function VCPartnersPage() {
         founderLastName: "",
         founderEmail: "",
         founderPhone: "",
+        hasCoFounder: undefined as unknown as YesNo,
+        cofounderFirstName: "",
+        cofounderLastName: "",
+        cofounderEmail: "",
         companyName: "",
         companyWebsite: "",
         industry: [],
@@ -353,6 +372,7 @@ export default function VCPartnersPage() {
         mrr: "",
         burnRate: "",
         previouslyRaised: "",
+        runwayMonths: "",
         wantsOtherCompetitions: undefined as unknown as YesNo,
         programs: [],
         competitions: [],
@@ -383,7 +403,7 @@ export default function VCPartnersPage() {
         setFocus(first as any);
         const msg =
           (firstError?.message as string | undefined) ||
-          `Please fill the required field: ${FIELD_LABEL[first] ?? String(first)}`;
+          `${FIELD_LABEL[first] ?? "This field"} is required`;
         toast.error(msg);
       } else {
         toast.error("Please complete the required fields.");
@@ -420,6 +440,10 @@ export default function VCPartnersPage() {
         lastName: v.founderLastName,
         email: v.founderEmail,
         phone: v.founderPhone,
+        hasCoFounder: v.hasCoFounder,
+        cofounderFirstName: v.cofounderFirstName || null,
+        cofounderLastName: v.cofounderLastName || null,
+        cofounderEmail: v.cofounderEmail || null,
       },
       company: {
         name: v.companyName,
@@ -446,6 +470,7 @@ export default function VCPartnersPage() {
         mrr: v.mrr,
         burnRate: v.burnRate,
         previouslyRaised: v.previouslyRaised,
+        runwayMonths: v.runwayMonths,
       },
       submittedAt: new Date().toISOString(),
     };
@@ -554,42 +579,6 @@ export default function VCPartnersPage() {
                 })}
               </div>
             </section>
-
-            {/* Perks */}
-            {/* <section>
-              <h2 className="text-2xl font-semibold">LvlUp Applicant Exclusive Perks</h2>
-              <Label className="text-neutral-400 text-xs uppercase tracking-wide">(select the options that apply)</Label>
-
-              <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-6">
-                {programsCards.map((pg) => {
-                  const isSelected = selectedPrograms.includes(pg.name);
-                  return (
-                    <button
-                      key={pg.id}
-                      type="button"
-                      onClick={() => toggleProgram(pg.name)}
-                      aria-pressed={isSelected}
-                      className={`text-left rounded-xl border p-6 shadow-lg transition focus:outline-none focus:ring-2 focus:ring-lime-300
-                        ${isSelected ? "border-lime-300 bg-[#1b1b1b]" : "border-neutral-800 bg-[#181818] hover:border-lime-300"}
-                        flex flex-col justify-start h-full min-h-[220px]`}
-                    >
-                      <div className="flex items-start justify-between gap-3">
-                        <h3 className="text-lg font-semibold">{pg.name}</h3>
-                        {isSelected && (
-                          <span className="shrink-0 rounded-md bg-lime-300 px-2 py-0.5 text-xs font-bold text-black">Selected</span>
-                        )}
-                      </div>
-                      <p className="text-sm text-neutral-400 mt-1">{pg.subtitle}</p>
-                      {pg.perks.length > 0 && (
-                        <ul className="mt-3 list-disc pl-5 text-sm text-neutral-400 space-y-1">
-                          {pg.perks.map((line, i) => <li key={i}>{line}</li>)}
-                        </ul>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            </section> */}
           </div>
 
           {/* RIGHT: Form */}
@@ -632,14 +621,70 @@ export default function VCPartnersPage() {
                       className="mt-2 !bg-[var(--form-input-bg)] border border-neutral-700 text-white placeholder-neutral-500 focus:border-lime-300"
                     />
                   </div>
-                  {/* <div>
-                    <Label className="text-neutral-400 text-xs uppercase tracking-wide">Founder Phone Number *</Label>
-                    <Input
-                      {...register("founderPhone", { required: true })}
-                      placeholder="+1 555 123 4567"
-                      className="mt-2 !bg-[var(--form-input-bg)] border border-neutral-700 text-white placeholder-neutral-500 focus:border-lime-300"
-                    />
-                  </div> */}
+
+                  {/* NEW: Co-Founder toggle */}
+                  <div className="sm:col-span-2">
+                    <Label className="text-neutral-400 text-xs uppercase tracking-wide">
+                      Do you have a Co-Founder? *
+                    </Label>
+                    <div className="mt-2">
+                      <PillYesNo name="hasCoFounder" register={register} />
+                    </div>
+                  </div>
+
+                  {/* NEW: Co-Founder fields (conditional) */}
+                  {hasCoFounder === "yes" && (
+                    <>
+                      <div>
+                        <Label className="text-neutral-400 text-xs uppercase tracking-wide">
+                          Co-Founder First Name *
+                        </Label>
+                        <Input
+                          {...register("cofounderFirstName", {
+                            validate: (v) =>
+                              hasCoFounder === "yes" && !v
+                                ? "Co-Founder First Name is required"
+                                : true,
+                          })}
+                          className="mt-2 !bg-[var(--form-input-bg)] border border-neutral-700 text-white placeholder-neutral-500 focus:border-lime-300"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-neutral-400 text-xs uppercase tracking-wide">
+                          Co-Founder Last Name *
+                        </Label>
+                        <Input
+                          {...register("cofounderLastName", {
+                            validate: (v) =>
+                              hasCoFounder === "yes" && !v
+                                ? "Co-Founder Last Name is required"
+                                : true,
+                          })}
+                          className="mt-2 !bg-[var(--form-input-bg)] border border-neutral-700 text-white placeholder-neutral-500 focus:border-lime-300"
+                        />
+                      </div>
+                      <div className="sm:col-span-2">
+                        <Label className="text-neutral-400 text-xs uppercase tracking-wide">
+                          Co-Founder Email *
+                        </Label>
+                        <Input
+                          type="email"
+                          {...register("cofounderEmail", {
+                            validate: (value) => {
+                              if (hasCoFounder !== "yes" && !value) return true;
+                              if (!value) return "Co-Founder Email is required";
+                              const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                              return pattern.test(value)
+                                ? true
+                                : "Enter a valid email address for Co-Founder";
+                            },
+                          })}
+                          placeholder="cofounder@startup.com"
+                          className="mt-2 !bg-[var(--form-input-bg)] border border-neutral-700 text-white placeholder-neutral-500 focus:border-lime-300"
+                        />
+                      </div>
+                    </>
+                  )}
                 </div>
               </section>
 
@@ -658,9 +703,6 @@ export default function VCPartnersPage() {
                     <Label className="text-neutral-400 text-xs uppercase tracking-wide">
                       Company Website *
                     </Label>
-                    {/* <p className="text-[11px] text-neutral-500 mt-1">
-                      Enter a URL starting with <span className="text-neutral-300">https://</span> or <span className="text-neutral-300">www.</span>
-                    </p> */}
                     <Input
                       type="text"
                       {...register("companyWebsite", {
@@ -860,12 +902,6 @@ export default function VCPartnersPage() {
                     <PillYesNo name="isForeignBornInUS" register={register} />
                   </div>
                 </div>
-                {/* <div>
-                  <Label className="text-neutral-400 text-xs uppercase tracking-wide">Are you a incorporated? *</Label>
-                  <div className="mt-2">
-                    <PillYesNo name="isForeignBornInUS" register={register} />
-                  </div>
-                </div> */}
               </section>
 
               {/* Financials */}
@@ -899,8 +935,8 @@ export default function VCPartnersPage() {
                     <Label className="text-neutral-400 text-xs uppercase tracking-wide">Raise Amount *</Label>
                     <Input
                       {...register("raiseAmount", {
-                            required: "Raise amount is required",
-                            validate: v => !isNaN(Number(v)) || "Enter a valid number",
+                        required: "Raise amount is required",
+                        validate: (v) => !isNaN(Number(v)) || "Enter a valid number",
                       })}
                       placeholder="$1,000,000"
                       className="mt-2 !bg-[var(--form-input-bg)] border border-neutral-700 text-white placeholder-neutral-500 focus:border-lime-300"
@@ -911,8 +947,8 @@ export default function VCPartnersPage() {
                     <Label className="text-neutral-400 text-xs uppercase tracking-wide">Valuation *</Label>
                     <Input
                       {...register("valuation", {
-                            required: "Valuation is required",
-                            validate: v => !isNaN(Number(v)) || "Enter a valid number",
+                        required: "Valuation is required",
+                        validate: (v) => !isNaN(Number(v)) || "Enter a valid number",
                       })}
                       placeholder="$10,000,000"
                       className="mt-2 !bg-[var(--form-input-bg)] border border-neutral-700 text-white placeholder-neutral-500 focus:border-lime-300"
@@ -923,8 +959,8 @@ export default function VCPartnersPage() {
                     <Label className="text-neutral-400 text-xs uppercase tracking-wide">Company MRR *</Label>
                     <Input
                       {...register("mrr", {
-                            required: "MRR is required",
-                            validate: v => !isNaN(Number(v)) || "Enter a valid number",
+                        required: "MRR is required",
+                        validate: (v) => !isNaN(Number(v)) || "Enter a valid number",
                       })}
                       placeholder="$25,000"
                       className="mt-2 !bg-[var(--form-input-bg)] border border-neutral-700 text-white placeholder-neutral-500 focus:border-lime-300"
@@ -935,8 +971,8 @@ export default function VCPartnersPage() {
                     <Label className="text-neutral-400 text-xs uppercase tracking-wide">Company Burn Rate *</Label>
                     <Input
                       {...register("burnRate", {
-                            required: "Burn rate is required",
-                            validate: v => !isNaN(Number(v)) || "Enter a valid number",
+                        required: "Burn rate is required",
+                        validate: (v) => !isNaN(Number(v)) || "Enter a valid number",
                       })}
                       placeholder="$40,000"
                       className="mt-2 !bg-[var(--form-input-bg)] border border-neutral-700 text-white placeholder-neutral-500 focus:border-lime-300"
@@ -947,10 +983,28 @@ export default function VCPartnersPage() {
                     <Label className="text-neutral-400 text-xs uppercase tracking-wide">Previously Raised Capital *</Label>
                     <Input
                       {...register("previouslyRaised", {
-                            required: "Previous funding amount required",
-                            validate: v => !isNaN(Number(v)) || "Enter a valid number",
+                        required: "Previous funding amount required",
+                        validate: (v) => !isNaN(Number(v)) || "Enter a valid number",
                       })}
                       placeholder="$500,000"
+                      className="mt-2 !bg-[var(--form-input-bg)] border border-neutral-700 text-white placeholder-neutral-500 focus:border-lime-300"
+                    />
+                  </div>
+
+                  {/* NEW: Runway months */}
+                  <div>
+                    <Label className="text-neutral-400 text-xs uppercase tracking-wide">
+                      Runway (months) *
+                    </Label>
+                    <Input
+                      {...register("runwayMonths", {
+                        required: "Runway (months) is required",
+                        validate: (v) => {
+                          if (!v) return "Runway (months) is required";
+                          return !isNaN(Number(v)) || "Enter a valid number of months";
+                        },
+                      })}
+                      placeholder="6"
                       className="mt-2 !bg-[var(--form-input-bg)] border border-neutral-700 text-white placeholder-neutral-500 focus:border-lime-300"
                     />
                   </div>
@@ -962,8 +1016,7 @@ export default function VCPartnersPage() {
                 <Label className="text-neutral-400 text-xs uppercase tracking-wide">
                   Do you want to participate in other pitch competitions hosted by or in partnership with LvlUp Ventures? *
                 </Label>
-                  <span className="text-neutral-500 text-[12px]">(Subject to change)</span>
-                
+                <span className="text-neutral-500 text-[12px]">(Subject to change)</span>
                 <div className="mt-2">
                   <PillYesNo name="wantsOtherCompetitions" register={register} />
                 </div>
