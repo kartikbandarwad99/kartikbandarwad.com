@@ -86,6 +86,32 @@ type PartnerCard = {
 
 const partnersCards: PartnerCard[] = [
   { id: "lvlup", name: "LvlUp Ventures Seed Fund", stage: "Pre-Seed to Seed", cheque: "$100,000 – $250,000", focus: "Industry agnostic", regions: "United States, Canada", criteria: ">3 months in market" },
+
+  // ✅ NEW (placed directly below lvlup as requested)
+  {
+    id: "lvlup-ecommerce-ecosystem-builders",
+    name: "LvlUp Ventures E-Commerce Ecosystem Builders Fund",
+    stage: "Pre-Seed through Series A",
+    cheque: "Up to $25,000 (follow-on up to $250,000)",
+    focus:
+      "E-commerce technology: AI agents, checkout tools, marketing automation, merchant workflows, OMS, loyalty, payments, logistics tooling, personalization engines, etc",
+    // regions: "Agnostic",
+    // criteria: "Early-stage commerce infrastructure startups transforming the future of commerce infrastructure",
+    // blurb:
+    //   "Investing in founders building next-generation tools for online merchants, with Day-1 capital, technical access, and direct distribution to SHOPLINE’s 500,000+ global sellers.",
+  },
+  {
+    id: "lvlup-b2b-saas-accel",
+    name: "LvlUp Ventures B2B SaaS Accel Fund",
+    // stage: "B2B SaaS",
+    cheque: "Up to $3.5M (non-dilutive financing)",
+    focus: "B2B SaaS",
+    regions: "United States (US incorporated)",
+    criteria: "$40,000 MRR • US Incorporated • B2B SaaS",
+    // blurb:
+    //   "Backs breakout B2B SaaS brands blending up to $3.5M in non-dilutive financing with the strategic support of a leading venture capital firm.",
+  },
+
   { id: "cove-fund", name: "Cove Fund", stage: "Pre-Seed to Series A", cheque: "~$500,000", focus: "Deep Tech, Life Sciences, Enterprise Software, Data Analytics", regions: "Southern California", criteria: "Strong moat and product-market fit" },
   { id: "expertdojo", name: "ExpertDojo", stage: "Seed to Series A", cheque: "$50,000 – $3,000,000", focus: "Industry agnostic; emphasis on underrepresented founders (not a requirement)", regions: "Agnostic" },
   { id: "loreal-cvc", name: "L’Oréal Corporate Venture Arm", stage: "Strategic CVC / Acquisitions (Series A–C)", focus: "Beauty tech, retail innovation, sustainability; innovations enhancing L’Oréal’s ecosystem", criteria: "Potential for integration with L’Oréal’s core businesses" },
@@ -187,6 +213,10 @@ type FormValues = {
   companyRegion: string;
   companyState?: string; // required only if region is United States
   elevatorPitch: string;
+
+  // ✅ NEW: business model
+  businessModel: string;
+
   pitchDeckPdf?: FileList;
   pitchDeckLink?: string;
 
@@ -277,6 +307,7 @@ export default function VCPartnersPage() {
       fundraisingStage: "", // ← empty by default
       programs: [],
       competitions: [],
+      businessModel: "", // ✅ NEW
     },
     shouldUseNativeValidation: true,
   });
@@ -299,6 +330,10 @@ export default function VCPartnersPage() {
     companyRegion: "Company Location (Region)",
     companyState: "State",
     elevatorPitch: "Elevator Pitch",
+
+    // ✅ NEW
+    businessModel: "Business Model",
+
     pitchDeckPdf: "Pitch Deck (PDF)",
     pitchDeckLink: "Pitch Deck (Link)",
     isB2BSaaSWithRunway: "B2B SaaS with ≥3 months runway",
@@ -358,6 +393,10 @@ export default function VCPartnersPage() {
         companyRegion: "",
         companyState: "",
         elevatorPitch: "",
+
+        // ✅ NEW
+        businessModel: "",
+
         pitchDeckPdf: undefined,
         pitchDeckLink: "",
         isB2BSaaSWithRunway: undefined as unknown as YesNo,
@@ -452,6 +491,10 @@ export default function VCPartnersPage() {
         region: v.companyRegion,
         state: v.companyState || null,
         elevatorPitch: v.elevatorPitch,
+
+        // ✅ NEW
+        businessModel: v.businessModel,
+
         deckLink: v.pitchDeckLink || null,
       },
       eligibility: {
@@ -721,6 +764,8 @@ export default function VCPartnersPage() {
                     />
                   </div>
 
+                  
+
                   {/* Industry: react-select multi (≤4) */}
                   <div className="sm:col-span-2">
                     <Label className="text-neutral-400 text-xs uppercase tracking-wide">Industry (choose up to 4) *</Label>
@@ -806,7 +851,6 @@ export default function VCPartnersPage() {
                       />
                     </div>
                   )}
-
                   <div className="sm:col-span-2">
                     <Label className="text-neutral-400 text-xs uppercase tracking-wide">Elevator Pitch (300 chars) *</Label>
                     <Textarea
@@ -817,6 +861,22 @@ export default function VCPartnersPage() {
                       className="mt-2 !bg-[var(--form-input-bg)] border border-neutral-700 text-white placeholder-neutral-500 focus:border-lime-300"
                     />
                     <div className="mt-1 text-xs text-neutral-500">{elevatorPitch.length}/300</div>
+                  </div>
+
+                  {/* ✅ NEW: Business Model (placed right after Elevator Pitch as requested) */}
+                  <div className="sm:col-span-2">
+                    <Label className="text-neutral-400 text-xs uppercase tracking-wide">
+                      Business Model *
+                    </Label>
+                    {/* <span className="text-neutral-500 text-[12px]">
+                      Summarize how your business creates and captures value: what you sell, who you sell to, and how revenue comes in.
+                    </span> */}
+                    <Textarea
+                      rows={4}
+                      {...register("businessModel", { required: true })}
+                      placeholder="what you sell, who you sell to, and how revenue comes in."
+                      className="mt-2 !bg-[var(--form-input-bg)] border border-neutral-700 text-white placeholder-neutral-500 focus:border-lime-300"
+                    />
                   </div>
 
                   <div className="sm:col-span-2 ">
@@ -1041,6 +1101,7 @@ export default function VCPartnersPage() {
                       fundraisingStage: "",
                       programs: [],
                       competitions: [],
+                      businessModel: "", // ✅ NEW
                     });
                     setSelectedPartners([]);
                     setSelectedCompetitions([]);

@@ -99,6 +99,7 @@ export async function submitApplicationAction(
         company_state: payload.company.state ?? null,
 
         elevator_pitch: payload.company.elevatorPitch ?? null,
+        business_model: payload.company.businessModel ?? null,
         deck_link: payload.company.deckLink ?? null,
 
         deck_pdf_path,
