@@ -20,7 +20,10 @@ import {
 import { X } from "lucide-react";
 import { useActionState } from "react";
 import { toast } from "sonner";
-import { submitApplicationAction, type SubmitState } from "@/app/actions/lvlupsubmit";
+import {
+  submitApplicationAction,
+  type SubmitState,
+} from "@/app/actions/lvlupsubmit";
 
 // ============================ react-select dark styles ============================
 const customStyles = {
@@ -37,10 +40,21 @@ const customStyles = {
     "&:hover": { borderColor: "#bef264" },
   }),
   valueContainer: (base: any) => ({ ...base, paddingLeft: 8, paddingRight: 8 }),
-  input: (base: any) => ({ ...base, color: "#fff", backgroundColor: "transparent", margin: 0, padding: 0 }),
+  input: (base: any) => ({
+    ...base,
+    color: "#fff",
+    backgroundColor: "transparent",
+    margin: 0,
+    padding: 0,
+  }),
   placeholder: (base: any) => ({ ...base, color: "#a3a3a3" }),
   singleValue: (base: any) => ({ ...base, color: "#fff" }),
-  multiValue: (base: any) => ({ ...base, backgroundColor: "#262626", borderRadius: 6, padding: "2px 6px" }),
+  multiValue: (base: any) => ({
+    ...base,
+    backgroundColor: "#262626",
+    borderRadius: 6,
+    padding: "2px 6px",
+  }),
   multiValueLabel: (base: any) => ({ ...base, color: "#fff", fontWeight: 500 }),
   multiValueRemove: (base: any) => ({
     ...base,
@@ -59,7 +73,11 @@ const customStyles = {
   }),
   option: (base: any, state: { isFocused: boolean; isSelected: boolean }) => ({
     ...base,
-    backgroundColor: state.isSelected ? "#2a2a2a" : state.isFocused ? "#222222" : "#111111",
+    backgroundColor: state.isSelected
+      ? "#2a2a2a"
+      : state.isFocused
+      ? "#222222"
+      : "#111111",
     color: "#fff",
     ":active": { backgroundColor: "#333333" },
   }),
@@ -85,7 +103,15 @@ type PartnerCard = {
 };
 
 const partnersCards: PartnerCard[] = [
-  { id: "lvlup", name: "LvlUp Ventures Seed Fund", stage: "Pre-Seed to Seed", cheque: "$100,000 – $250,000", focus: "Industry agnostic", regions: "United States, Canada", criteria: ">3 months in market" },
+  {
+    id: "lvlup",
+    name: "LvlUp Ventures Seed Fund",
+    stage: "Pre-Seed to Seed",
+    cheque: "$100,000 – $250,000",
+    focus: "Industry agnostic",
+    regions: "United States, Canada",
+    criteria: ">3 months in market",
+  },
 
   // ✅ NEW (placed directly below lvlup as requested)
   {
@@ -112,77 +138,311 @@ const partnersCards: PartnerCard[] = [
     //   "Backs breakout B2B SaaS brands blending up to $3.5M in non-dilutive financing with the strategic support of a leading venture capital firm.",
   },
 
-  { id: "cove-fund", name: "Cove Fund", stage: "Pre-Seed to Series A", cheque: "~$500,000", focus: "Deep Tech, Life Sciences, Enterprise Software, Data Analytics", regions: "Southern California", criteria: "Strong moat and product-market fit" },
-  { id: "expertdojo", name: "ExpertDojo", stage: "Seed to Series A", cheque: "$50,000 – $3,000,000", focus: "Industry agnostic; emphasis on underrepresented founders (not a requirement)", regions: "Agnostic" },
-  { id: "loreal-cvc", name: "L’Oréal Corporate Venture Arm", stage: "Strategic CVC / Acquisitions (Series A–C)", focus: "Beauty tech, retail innovation, sustainability; innovations enhancing L’Oréal’s ecosystem", criteria: "Potential for integration with L’Oréal’s core businesses" },
-  { id: "sunset-ventures", name: "Sunset Ventures", stage: "Post-Seed", focus: "MediaTech, Creative Industries, Commerce, FinTech, Software", regions: "U.S. (California preferred)", criteria: "≥$250K annual revenue" },
-  { id: "acronym", name: "Acronym VC", stage: "Late Seed to Series A", focus: "Enterprise & SMB SaaS — FinTech, Hospitality Tech, PropTech, Workflow, E-commerce Infrastructure, Cybersecurity, select Healthcare SaaS", regions: "U.S." },
-  { id: "apus-vc", name: "Apus VC", stage: "Early-stage (Post-revenue)", focus: "Tech and Real Estate; long-term growth with strategic/operational support", criteria: "Founders open to active partnership and board participation" },
-  { id: "greycroft", name: "Greycroft", stage: "Seed to Series C", cheque: "Up to $50,000,000", focus: "Software generalists with emphasis on AI apps (consumer/B2B) and infrastructure", regions: "Primarily U.S." },
-  { id: "minnow", name: "Minnow Ventures", stage: "Pre-Seed to Series A", focus: "Healthcare — Biotech, HealthTech, AI in Healthcare, Drug Discovery, Lab Infrastructure", criteria: "Early-stage companies advancing healthcare innovation" },
-  { id: "outlander", name: "Outlander VC", stage: "Pre-Seed and Seed", focus: "Industry agnostic", regions: "U.S.", criteria: "Strong early-stage founders with scalable potential", blurb: "Currently deploying Fund III ($150M)." },
-  { id: "rpv-global", name: "RPV Global", stage: "Pre-Seed", focus: "Deep Tech (excludes Biotech, Pharma, Longevity, Psychedelics, Crypto, Software)", criteria: "U.S.-based with a proven scientific breakthrough" },
-  { id: "brickyard", name: "Brickyard", stage: "Pre-Seed and Seed", cheque: "Up to $500,000", focus: "Industry agnostic", regions: "Global founders accepted; onsite in Chattanooga, TN until $1M ARR (optional for other team members)", criteria: "Founders committed to full focus and execution (“burn the ships”)" },
-  { id: "enough", name: "Enough Ventures", stage: "Pre-Seed and Seed", focus: "HealthTech, AgeTech, Digital Infrastructure", regions: "Agnostic", criteria: "Purpose-driven ventures with measurable impact" },
-  { id: "capital-midwest", name: "Capital Midwest Fund", stage: "Seed and Series A", focus: "Early revenue–stage software & tech-enabled (excludes healthcare and hardware)", regions: "Central U.S.", criteria: "Independent or syndicate participation" },
-  { id: "lvlup-labs", name: "LvlUp Labs", stage: "N/A (Community platform, not a fund)", focus: "Founders-only community powered by LvlUp Ventures’ ecosystem", criteria: "Open to top-tier founders; free membership" },
-  { id: "new-road", name: "New Road Capital", stage: "Growth to Expansion", cheque: "$5,000,000 – $20,000,000", focus: "Supply Chain & Logistics, Retail Technology, Marketing Technology", regions: "Mainly U.S.", criteria: "≥$1M ARR; PMF achieved" },
-  { id: "incisive", name: "Incisive Ventures", stage: "Pre-Seed", cheque: "$250,000 – $750,000", focus: "B2B software; invests after MVP has been in customers’ hands ≥3 months; typical rounds $500K–$2M", criteria: "Post-revenue; product in-market with early customer validation" },
-  { id: "struck", name: "Struck Capital", stage: "Seed, Pre-Seed", focus: "B2B Enterprise SaaS; Vertical AI; Agentic AI", regions: "Global"},
-  { id: "emerging-ventures", name: "Emerging Ventures", stage: "Late Seed", cheque: "$100,000 – $500,000", focus: "Capital-efficient B2B Technology; Emerging Technologies", regions: "United States & Canada", criteria: "Live product & early traction; scalable sales; clear path to Series A"},
-  { id: "connetic", name: "Connetic Ventures", stage: "Pre-Seed and Seed", cheque: "$500,000 – $1,000,000", focus: "Software, Data Analytics, FinTech, Consumer Products", regions: "North America (except Bay Area and Boston)" },
-  { id: "corner-capital", name: "Corner Capital", stage: "Pre-Seed to Series A", focus: "Industry-agnostic early-stage tech companies", regions: "United States & Israel"},
+  {
+    id: "cove-fund",
+    name: "Cove Fund",
+    stage: "Pre-Seed to Series A",
+    cheque: "~$500,000",
+    focus: "Deep Tech, Life Sciences, Enterprise Software, Data Analytics",
+    regions: "Southern California",
+    criteria: "Strong moat and product-market fit",
+  },
+  {
+    id: "expertdojo",
+    name: "ExpertDojo",
+    stage: "Seed to Series A",
+    cheque: "$50,000 – $3,000,000",
+    focus:
+      "Industry agnostic; emphasis on underrepresented founders (not a requirement)",
+    regions: "Agnostic",
+  },
+  {
+    id: "loreal-cvc",
+    name: "L’Oréal Corporate Venture Arm",
+    stage: "Strategic CVC / Acquisitions (Series A–C)",
+    focus:
+      "Beauty tech, retail innovation, sustainability; innovations enhancing L’Oréal’s ecosystem",
+    criteria: "Potential for integration with L’Oréal’s core businesses",
+  },
+  {
+    id: "sunset-ventures",
+    name: "Sunset Ventures",
+    stage: "Post-Seed",
+    focus: "MediaTech, Creative Industries, Commerce, FinTech, Software",
+    regions: "U.S. (California preferred)",
+    criteria: "≥$250K annual revenue",
+  },
+  {
+    id: "acronym",
+    name: "Acronym VC",
+    stage: "Late Seed to Series A",
+    focus:
+      "Enterprise & SMB SaaS — FinTech, Hospitality Tech, PropTech, Workflow, E-commerce Infrastructure, Cybersecurity, select Healthcare SaaS",
+    regions: "U.S.",
+  },
+  {
+    id: "apus-vc",
+    name: "Apus VC",
+    stage: "Early-stage (Post-revenue)",
+    focus: "Tech and Real Estate; long-term growth with strategic/operational support",
+    criteria: "Founders open to active partnership and board participation",
+  },
+  {
+    id: "greycroft",
+    name: "Greycroft",
+    stage: "Seed to Series C",
+    cheque: "Up to $50,000,000",
+    focus: "Software generalists with emphasis on AI apps (consumer/B2B) and infrastructure",
+    regions: "Primarily U.S.",
+  },
+  {
+    id: "minnow",
+    name: "Minnow Ventures",
+    stage: "Pre-Seed to Series A",
+    focus:
+      "Healthcare — Biotech, HealthTech, AI in Healthcare, Drug Discovery, Lab Infrastructure",
+    criteria: "Early-stage companies advancing healthcare innovation",
+  },
+  {
+    id: "outlander",
+    name: "Outlander VC",
+    stage: "Pre-Seed and Seed",
+    focus: "Industry agnostic",
+    regions: "U.S.",
+    criteria: "Strong early-stage founders with scalable potential",
+    blurb: "Currently deploying Fund III ($150M).",
+  },
+  {
+    id: "rpv-global",
+    name: "RPV Global",
+    stage: "Pre-Seed",
+    focus:
+      "Deep Tech (excludes Biotech, Pharma, Longevity, Psychedelics, Crypto, Software)",
+    criteria: "U.S.-based with a proven scientific breakthrough",
+  },
+  {
+    id: "brickyard",
+    name: "Brickyard",
+    stage: "Pre-Seed and Seed",
+    cheque: "Up to $500,000",
+    focus: "Industry agnostic",
+    regions:
+      "Global founders accepted; onsite in Chattanooga, TN until $1M ARR (optional for other team members)",
+    criteria: "Founders committed to full focus and execution (“burn the ships”)",
+  },
+  {
+    id: "enough",
+    name: "Enough Ventures",
+    stage: "Pre-Seed and Seed",
+    focus: "HealthTech, AgeTech, Digital Infrastructure",
+    regions: "Agnostic",
+    criteria: "Purpose-driven ventures with measurable impact",
+  },
+  {
+    id: "capital-midwest",
+    name: "Capital Midwest Fund",
+    stage: "Seed and Series A",
+    focus:
+      "Early revenue–stage software & tech-enabled (excludes healthcare and hardware)",
+    regions: "Central U.S.",
+    criteria: "Independent or syndicate participation",
+  },
+  {
+    id: "lvlup-labs",
+    name: "LvlUp Labs",
+    stage: "N/A (Community platform, not a fund)",
+    focus: "Founders-only community powered by LvlUp Ventures’ ecosystem",
+    criteria: "Open to top-tier founders; free membership",
+  },
+  {
+    id: "new-road",
+    name: "New Road Capital",
+    stage: "Growth to Expansion",
+    cheque: "$5,000,000 – $20,000,000",
+    focus: "Supply Chain & Logistics, Retail Technology, Marketing Technology",
+    regions: "Mainly U.S.",
+    criteria: "≥$1M ARR; PMF achieved",
+  },
+  {
+    id: "incisive",
+    name: "Incisive Ventures",
+    stage: "Pre-Seed",
+    cheque: "$250,000 – $750,000",
+    focus:
+      "B2B software; invests after MVP has been in customers’ hands ≥3 months; typical rounds $500K–$2M",
+    criteria: "Post-revenue; product in-market with early customer validation",
+  },
+  {
+    id: "struck",
+    name: "Struck Capital",
+    stage: "Seed, Pre-Seed",
+    focus: "B2B Enterprise SaaS; Vertical AI; Agentic AI",
+    regions: "Global",
+  },
+  {
+    id: "emerging-ventures",
+    name: "Emerging Ventures",
+    stage: "Late Seed",
+    cheque: "$100,000 – $500,000",
+    focus: "Capital-efficient B2B Technology; Emerging Technologies",
+    regions: "United States & Canada",
+    criteria:
+      "Live product & early traction; scalable sales; clear path to Series A",
+  },
+  {
+    id: "connetic",
+    name: "Connetic Ventures",
+    stage: "Pre-Seed and Seed",
+    cheque: "$500,000 – $1,000,000",
+    focus: "Software, Data Analytics, FinTech, Consumer Products",
+    regions: "North America (except Bay Area and Boston)",
+  },
+  {
+    id: "corner-capital",
+    name: "Corner Capital",
+    stage: "Pre-Seed to Series A",
+    focus: "Industry-agnostic early-stage tech companies",
+    regions: "United States & Israel",
+  },
 ];
 
 // ========= LvlUp Ventures Bootcamps =========
-type BootcampCard = { id: string; name: string; subtitle: string; description: string; features: string[] };
+type BootcampCard = {
+  id: string;
+  name: string;
+  subtitle: string;
+  description: string;
+  features: string[];
+};
 const bootcampCards: BootcampCard[] = [
   {
     id: "data-room",
     name: "LvlUp Cutting-Edge Data Room & Operations HQ Bootcamp",
     subtitle: "Build a world-class investor data room & ops HQ (Notion + AI).",
-    description: "Self-paced, <30-day bootcamp to streamline operations and investor readiness. Ends with a live Demo Day & certification.",
-    features: ["Free 6 months of Notion Pro + AI", "1:1 session with LvlUp team", "Weekly office hours & Demo Day with VCs", "Top 3 win expedited funding review (up to $1M)"],
+    description:
+      "Self-paced, <30-day bootcamp to streamline operations and investor readiness. Ends with a live Demo Day & certification.",
+    features: [
+      "Free 6 months of Notion Pro + AI",
+      "1:1 session with LvlUp team",
+      "Weekly office hours & Demo Day with VCs",
+      "Top 3 win expedited funding review (up to $1M)",
+    ],
   },
   {
     id: "cap-table",
     name: "Prime Equity & Cap Table Bootcamp",
     subtitle: "Master equity management and VC-ready cap tables.",
-    description: "Learn how to structure ownership, model dilution, and forecast raises. Culminates in Demo Day & certification.",
-    features: ["1:1 sessions with Qapita + LvlUp", "Advisor agreement & templates included", "Access 3,000+ investor list post-graduation", "Top founders fast-tracked for $1M review"],
+    description:
+      "Learn how to structure ownership, model dilution, and forecast raises. Culminates in Demo Day & certification.",
+    features: [
+      "1:1 sessions with Qapita + LvlUp",
+      "Advisor agreement & templates included",
+      "Access 3,000+ investor list post-graduation",
+      "Top founders fast-tracked for $1M review",
+    ],
   },
   {
     id: "financial-modeling",
     name: "LvlUp × Grasshopper Bank: Financial Modeling & Startup Banking Bootcamp",
     subtitle: "Optimize your financial systems and fundraising strategy.",
-    description: "Self-paced program to master startup banking, cash flow, and modeling. Includes Demo Day with investors.",
-    features: ["1:1 review with LvlUp & Grasshopper experts", "Curated 1,700+ investor list", "Workshops on cash flow & growth modeling", "Demo Day + awards + fast-track for $1M funding"],
+    description:
+      "Self-paced program to master startup banking, cash flow, and modeling. Includes Demo Day with investors.",
+    features: [
+      "1:1 review with LvlUp & Grasshopper experts",
+      "Curated 1,700+ investor list",
+      "Workshops on cash flow & growth modeling",
+      "Demo Day + awards + fast-track for $1M funding",
+    ],
   },
 ];
 
 // ========= LvlUp Applicant Exclusive Perks =========
 type ProgramCard = { id: string; name: string; subtitle: string; perks: string[] };
 const programsCards: ProgramCard[] = [
-  { id: "wing", name: "Wing × LvlUp Ventures Perk", subtitle: "Access Top-Tier Entry & Mid-Level Talent at LvlUp-Subsidized Rates (Starting at $500/Month) — Used by 1,000+ Teams at Google, DoorDash & Harvard University", perks: ["Complimentary 1:1 consultation", "Earn a $50 startup grant after attending your consultation"] },
-  { id: "shields", name: "Shields Group Executive Search × LvlUp Ventures Perk", subtitle: "For High-Level Hires | FREE Hiring Strategy Session", perks: [] },
-  { id: "gcloud", name: "Google Cloud × LvlUp Ventures Perk", subtitle: "Up To $350K in Free Credits", perks: [] },
+  {
+    id: "wing",
+    name: "Wing × LvlUp Ventures Perk",
+    subtitle:
+      "Access Top-Tier Entry & Mid-Level Talent at LvlUp-Subsidized Rates (Starting at $500/Month) — Used by 1,000+ Teams at Google, DoorDash & Harvard University",
+    perks: [
+      "Complimentary 1:1 consultation",
+      "Earn a $50 startup grant after attending your consultation",
+    ],
+  },
+  {
+    id: "shields",
+    name: "Shields Group Executive Search × LvlUp Ventures Perk",
+    subtitle: "For High-Level Hires | FREE Hiring Strategy Session",
+    perks: [],
+  },
+  {
+    id: "gcloud",
+    name: "Google Cloud × LvlUp Ventures Perk",
+    subtitle: "Up To $350K in Free Credits",
+    perks: [],
+  },
 ];
 
 // ============================ Form fields ============================
 const industryOptions = [
-  "Adtech","AgeTech","AI","AR/VR","ArtTech","B2B","BioTech","Consumer",
-  "Climate or CleanTech","Creator Economy","Cybersecurity","DeepTech","E-Commerce",
-  "EdTech","Energy","Enterprise","FinTech","FoodTech","Future of Work","Gaming",
-  "Hardware","HealthTech","InsurTech","LegalTech","Logistics & Manufacturing",
-  "Media & Entertainment","MusicTech","Payments","Pets","PropTech","Retail","Saas",
-  "Web 3.0","Other",
+  "Adtech",
+  "AgeTech",
+  "AI",
+  "AR/VR",
+  "ArtTech",
+  "B2B",
+  "BioTech",
+  "Consumer",
+  "Climate or CleanTech",
+  "Creator Economy",
+  "Cybersecurity",
+  "DeepTech",
+  "E-Commerce",
+  "EdTech",
+  "Energy",
+  "Enterprise",
+  "FinTech",
+  "FoodTech",
+  "Future of Work",
+  "Gaming",
+  "Hardware",
+  "HealthTech",
+  "InsurTech",
+  "LegalTech",
+  "Logistics & Manufacturing",
+  "Media & Entertainment",
+  "MusicTech",
+  "Payments",
+  "Pets",
+  "PropTech",
+  "Retail",
+  "Saas",
+  "Web 3.0",
+  "Other",
 ];
 
 const regionOptions = [
-  "United States","LATAM","United Kingdom","Canada","Israel","Europe","India","Asia","Singapore","Other",
+  "United States",
+  "LATAM",
+  "United Kingdom",
+  "Canada",
+  "Israel",
+  "Europe",
+  "India",
+  "Asia",
+  "Singapore",
+  "Other",
 ].map((r) => ({ value: r, label: r }));
 
-const stageSelect = ["Bridge Round","Pre-Seed", "Seed","Seed Extension/Seed+", "Series A", "Series B","Series C"];
+const stageSelect = [
+  "Bridge Round",
+  "Pre-Seed",
+  "Seed",
+  "Seed Extension/Seed+",
+  "Series A",
+  "Series B",
+  "Series C",
+];
 
 // US states (basic list)
 const US_STATES = [
@@ -226,7 +486,6 @@ type FormValues = {
   hasBlackFounder: YesNo;
   hasFemaleFounder: YesNo;
   isForeignBornInUS: YesNo;
-  // isIncorporated: YesNo;
 
   fundraisingStage: string;
   raiseAmount: string;
@@ -234,11 +493,24 @@ type FormValues = {
   mrr: string;
   burnRate: string;
   previouslyRaised: string;
-  runwayMonths: string; // NEW: runway months
+  runwayMonths: string;
   wantsOtherCompetitions: YesNo;
 
   programs: string[];
   competitions: string[];
+
+  // ✅ Fund-specific questions
+  // E-Commerce Ecosystem Builders
+  ecomCustomerCount: string;
+  ecomPlansMerchants: YesNo;
+  ecomPlatforms: string[];
+
+  // B2B SaaS Accel
+  b2bIncorporatedUS: YesNo;
+  b2bTrailing12MoRevenue: string;
+
+  // Outlander VC
+  outlanderHasTechnical10pct: YesNo;
 };
 
 /* ========== Yes/No pill ========== */
@@ -257,11 +529,21 @@ function PillYesNo({
   return (
     <div className="inline-flex gap-3">
       <label className="inline-flex items-center">
-        <input type="radio" value="yes" {...register(name as any, { required })} className="peer sr-only" />
+        <input
+          type="radio"
+          value="yes"
+          {...register(name as any, { required })}
+          className="peer sr-only"
+        />
         <span className={base}>Yes</span>
       </label>
       <label className="inline-flex items-center">
-        <input type="radio" value="no" {...register(name as any, { required })} className="peer sr-only" />
+        <input
+          type="radio"
+          value="no"
+          {...register(name as any, { required })}
+          className="peer sr-only"
+        />
         <span className={base}>No</span>
       </label>
     </div>
@@ -280,7 +562,10 @@ export default function VCPartnersPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const togglePartner = (id: string) =>
-    setSelectedPartners((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+    setSelectedPartners((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+
   const toggleCompetition = (id: string) =>
     setSelectedCompetitions((prev) => {
       const set = new Set(prev);
@@ -288,8 +573,13 @@ export default function VCPartnersPage() {
       else if (set.size < 5) set.add(id);
       return Array.from(set);
     });
+
   const toggleProgram = (programName: string) =>
-    setSelectedPrograms((prev) => (prev.includes(programName) ? prev.filter((x) => x !== programName) : [...prev, programName]));
+    setSelectedPrograms((prev) =>
+      prev.includes(programName)
+        ? prev.filter((x) => x !== programName)
+        : [...prev, programName]
+    );
 
   const {
     register,
@@ -304,10 +594,20 @@ export default function VCPartnersPage() {
   } = useForm<FormValues>({
     defaultValues: {
       industry: [],
-      fundraisingStage: "", // ← empty by default
+      fundraisingStage: "",
       programs: [],
       competitions: [],
-      businessModel: "", // ✅ NEW
+      businessModel: "",
+
+      // Fund-specific defaults
+      ecomCustomerCount: "",
+      ecomPlansMerchants: undefined as unknown as YesNo,
+      ecomPlatforms: [],
+
+      b2bIncorporatedUS: undefined as unknown as YesNo,
+      b2bTrailing12MoRevenue: "",
+
+      outlanderHasTechnical10pct: undefined as unknown as YesNo,
     },
     shouldUseNativeValidation: true,
   });
@@ -331,7 +631,6 @@ export default function VCPartnersPage() {
     companyState: "State",
     elevatorPitch: "Elevator Pitch",
 
-    // ✅ NEW
     businessModel: "Business Model",
 
     pitchDeckPdf: "Pitch Deck (PDF)",
@@ -342,7 +641,6 @@ export default function VCPartnersPage() {
     hasBlackFounder: "Black founder",
     hasFemaleFounder: "Female founder",
     isForeignBornInUS: "Foreign-born founder in the U.S.",
-    // isIncorporated: "Incorporated Status",
     fundraisingStage: "Fundraising Stage",
     raiseAmount: "Raise Amount",
     valuation: "Valuation",
@@ -353,6 +651,15 @@ export default function VCPartnersPage() {
     wantsOtherCompetitions: "Other Pitch Competitions",
     programs: "Programs",
     competitions: "Competitions",
+
+    // Fund-specific
+    ecomCustomerCount: "E-Commerce: Customer/User Count",
+    ecomPlansMerchants: "E-Commerce: Plans to expand into merchants",
+    ecomPlatforms: "E-Commerce: Platform Integrations",
+    b2bIncorporatedUS: "B2B SaaS Accel: US Incorporation",
+    b2bTrailing12MoRevenue: "B2B SaaS Accel: Trailing 12 Month Revenue",
+    outlanderHasTechnical10pct:
+      "Outlander VC: Technical founder/lead with ≥10% equity",
   };
 
   // bind card selections into form values (for submission/clear)
@@ -364,6 +671,27 @@ export default function VCPartnersPage() {
   const hasCoFounder = watch("hasCoFounder");
 
   const formRef = useRef<HTMLFormElement | null>(null);
+
+  // fund selection flags
+  const isEcomFundSelected = selectedPartners.includes("lvlup-ecommerce-ecosystem-builders");
+  const isB2bAccelSelected = selectedPartners.includes("lvlup-b2b-saas-accel");
+  const isOutlanderSelected = selectedPartners.includes("outlander");
+
+  // clear fund-specific values when fund is deselected
+  useEffect(() => {
+    if (!isEcomFundSelected) {
+      setValue("ecomCustomerCount", "");
+      setValue("ecomPlansMerchants", undefined as unknown as YesNo);
+      setValue("ecomPlatforms", []);
+    }
+    if (!isB2bAccelSelected) {
+      setValue("b2bIncorporatedUS", undefined as unknown as YesNo);
+      setValue("b2bTrailing12MoRevenue", "");
+    }
+    if (!isOutlanderSelected) {
+      setValue("outlanderHasTechnical10pct", undefined as unknown as YesNo);
+    }
+  }, [isEcomFundSelected, isB2bAccelSelected, isOutlanderSelected, setValue]);
 
   // useActionState -> action signature (prev, formData) => state
   const [submitState, formAction, isPending] = useActionState<SubmitState, FormData>(
@@ -393,10 +721,7 @@ export default function VCPartnersPage() {
         companyRegion: "",
         companyState: "",
         elevatorPitch: "",
-
-        // ✅ NEW
         businessModel: "",
-
         pitchDeckPdf: undefined,
         pitchDeckLink: "",
         isB2BSaaSWithRunway: undefined as unknown as YesNo,
@@ -415,7 +740,16 @@ export default function VCPartnersPage() {
         wantsOtherCompetitions: undefined as unknown as YesNo,
         programs: [],
         competitions: [],
+
+        // fund-specific
+        ecomCustomerCount: "",
+        ecomPlansMerchants: undefined as unknown as YesNo,
+        ecomPlatforms: [],
+        b2bIncorporatedUS: undefined as unknown as YesNo,
+        b2bTrailing12MoRevenue: "",
+        outlanderHasTechnical10pct: undefined as unknown as YesNo,
       });
+
       setSelectedPartners([]);
       setSelectedCompetitions([]);
       setSelectedPrograms([]);
@@ -453,9 +787,6 @@ export default function VCPartnersPage() {
     // Enforce VC partners selection (at least 1)
     if (selectedPartners.length === 0) {
       toast.error("Please select at least one VC partner.");
-      // focus roughly the section by scrolling to the cards header
-      const heading = document.querySelector("h2:text-is('VC Partners')") as HTMLElement | null;
-      if (heading?.scrollIntoView) heading.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
 
@@ -465,6 +796,49 @@ export default function VCPartnersPage() {
       setFocus("companyState" as any);
       toast.error("Please select a state.");
       return;
+    }
+
+    // Fund-specific defensive checks
+    if (isEcomFundSelected) {
+      if (!vCheck.ecomCustomerCount || isNaN(Number(vCheck.ecomCustomerCount))) {
+        setFocus("ecomCustomerCount" as any);
+        toast.error("Please enter a valid customer/user count.");
+        return;
+      }
+      if (!vCheck.ecomPlansMerchants) {
+        setFocus("ecomPlansMerchants" as any);
+        toast.error("Please answer the merchants expansion question.");
+        return;
+      }
+      if (!vCheck.ecomPlatforms?.length) {
+        toast.error("Please select at least one E-Commerce platform option.");
+        return;
+      }
+      if (vCheck.ecomPlatforms.includes("None") && vCheck.ecomPlatforms.length > 1) {
+        toast.error(`"None" can't be selected with other platforms.`);
+        return;
+      }
+    }
+
+    if (isB2bAccelSelected) {
+      if (!vCheck.b2bIncorporatedUS) {
+        setFocus("b2bIncorporatedUS" as any);
+        toast.error("Please indicate whether you are incorporated in the U.S.");
+        return;
+      }
+      if (!vCheck.b2bTrailing12MoRevenue || isNaN(Number(vCheck.b2bTrailing12MoRevenue))) {
+        setFocus("b2bTrailing12MoRevenue" as any);
+        toast.error("Please enter a valid Trailing 12 Month Revenue.");
+        return;
+      }
+    }
+
+    if (isOutlanderSelected) {
+      if (!vCheck.outlanderHasTechnical10pct) {
+        setFocus("outlanderHasTechnical10pct" as any);
+        toast.error("Please answer the Outlander VC technical lead equity requirement.");
+        return;
+      }
     }
 
     if (!formRef.current) return;
@@ -491,10 +865,7 @@ export default function VCPartnersPage() {
         region: v.companyRegion,
         state: v.companyState || null,
         elevatorPitch: v.elevatorPitch,
-
-        // ✅ NEW
         businessModel: v.businessModel,
-
         deckLink: v.pitchDeckLink || null,
       },
       eligibility: {
@@ -514,6 +885,26 @@ export default function VCPartnersPage() {
         burnRate: v.burnRate,
         previouslyRaised: v.previouslyRaised,
         runwayMonths: v.runwayMonths,
+      },
+      fundSpecific: {
+        ecomEcosystemBuilders: isEcomFundSelected
+          ? {
+              customerCount: v.ecomCustomerCount,
+              plansMerchants: v.ecomPlansMerchants === "yes",
+              platforms: v.ecomPlatforms,
+            }
+          : null,
+        b2bSaasAccel: isB2bAccelSelected
+          ? {
+              incorporatedUS: v.b2bIncorporatedUS === "yes",
+              trailing12MoRevenue: v.b2bTrailing12MoRevenue,
+            }
+          : null,
+        outlander: isOutlanderSelected
+          ? {
+              hasTechnicalLead10pct: v.outlanderHasTechnical10pct === "yes",
+            }
+          : null,
       },
       submittedAt: new Date().toISOString(),
     };
@@ -565,22 +956,53 @@ export default function VCPartnersPage() {
                       onClick={() => togglePartner(p.id)}
                       aria-pressed={isSelected}
                       className={`text-left rounded-xl border p-6 shadow-lg transition focus:outline-none focus:ring-2 focus:ring-lime-300
-                        ${isSelected ? "border-lime-300 bg-[#1b1b1b]" : "border-neutral-800 bg-[#181818] hover:border-lime-300"}
+                        ${
+                          isSelected
+                            ? "border-lime-300 bg-[#1b1b1b]"
+                            : "border-neutral-800 bg-[#181818] hover:border-lime-300"
+                        }
                         flex flex-col justify-start h-full min-h-[260px]`}
                     >
                       <div className="flex items-start justify-between gap-3">
                         <h3 className="text-lg font-semibold">{p.name}</h3>
                         {isSelected && (
-                          <span className="shrink-0 rounded-md bg-lime-300 px-2 py-0.5 text-xs font-bold text-black">Selected</span>
+                          <span className="shrink-0 rounded-md bg-lime-300 px-2 py-0.5 text-xs font-bold text-black">
+                            Selected
+                          </span>
                         )}
                       </div>
                       {p.blurb && <p className="text-sm text-neutral-400 mt-2">{p.blurb}</p>}
                       <div className="mt-3 grid gap-1 text-sm text-neutral-400">
-                        {p.focus && <p><span className="text-neutral-300 font-medium">Sectors:</span> {p.focus}</p>}
-                        {p.regions && <p><span className="text-neutral-300 font-medium">Geography:</span> {p.regions}</p>}
-                        {p.stage && <p><span className="text-neutral-300 font-medium">Stage:</span> {p.stage}</p>}
-                        {p.cheque && <p><span className="text-neutral-300 font-medium">Cheque:</span> {p.cheque}</p>}
-                        {p.criteria && <p><span className="text-neutral-300 font-medium">Additional Criteria:</span> {p.criteria}</p>}
+                        {p.focus && (
+                          <p>
+                            <span className="text-neutral-300 font-medium">Sectors:</span>{" "}
+                            {p.focus}
+                          </p>
+                        )}
+                        {p.regions && (
+                          <p>
+                            <span className="text-neutral-300 font-medium">Geography:</span>{" "}
+                            {p.regions}
+                          </p>
+                        )}
+                        {p.stage && (
+                          <p>
+                            <span className="text-neutral-300 font-medium">Stage:</span>{" "}
+                            {p.stage}
+                          </p>
+                        )}
+                        {p.cheque && (
+                          <p>
+                            <span className="text-neutral-300 font-medium">Cheque:</span>{" "}
+                            {p.cheque}
+                          </p>
+                        )}
+                        {p.criteria && (
+                          <p>
+                            <span className="text-neutral-300 font-medium">Additional Criteria:</span>{" "}
+                            {p.criteria}
+                          </p>
+                        )}
                       </div>
                     </button>
                   );
@@ -591,7 +1013,9 @@ export default function VCPartnersPage() {
             {/* Bootcamps */}
             <section>
               <h2 className="text-2xl font-semibold">LvlUp Ventures Bootcamps</h2>
-              <Label className="text-neutral-400 text-xs uppercase tracking-wide">(select the ones that apply)</Label>
+              <Label className="text-neutral-400 text-xs uppercase tracking-wide">
+                (select the ones that apply)
+              </Label>
 
               <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {bootcampCards.map((b) => {
@@ -603,19 +1027,27 @@ export default function VCPartnersPage() {
                       onClick={() => toggleProgram(b.name)}
                       aria-pressed={isSelected}
                       className={`text-left rounded-xl border p-6 shadow-lg transition focus:outline-none focus:ring-2 focus:ring-lime-300
-                        ${isSelected ? "border-lime-300 bg-[#1b1b1b]" : "border-neutral-800 bg-[#181818] hover:border-lime-300"}
+                        ${
+                          isSelected
+                            ? "border-lime-300 bg-[#1b1b1b]"
+                            : "border-neutral-800 bg-[#181818] hover:border-lime-300"
+                        }
                         flex flex-col justify-start h-full min-h-[260px]`}
                     >
                       <div className="flex items-start justify-between gap-3">
                         <h3 className="text-lg font-semibold">{b.name}</h3>
                         {isSelected && (
-                          <span className="shrink-0 rounded-md bg-lime-300 px-2 py-0.5 text-xs font-bold text-black">Selected</span>
+                          <span className="shrink-0 rounded-md bg-lime-300 px-2 py-0.5 text-xs font-bold text-black">
+                            Selected
+                          </span>
                         )}
                       </div>
                       <p className="text-sm text-neutral-400 mt-1">{b.subtitle}</p>
                       <p className="text-sm text-neutral-400 mt-2">{b.description}</p>
                       <ul className="mt-3 list-disc pl-5 text-sm text-neutral-400 space-y-1">
-                        {b.features.map((f, i) => <li key={i}>{f}</li>)}
+                        {b.features.map((f, i) => (
+                          <li key={i}>{f}</li>
+                        ))}
                       </ul>
                     </button>
                   );
@@ -628,7 +1060,7 @@ export default function VCPartnersPage() {
           <div className="md:col-span-5">
             <form
               ref={formRef}
-              action={formAction} // <- useActionState dispatcher
+              action={formAction}
               className="space-y-8 rounded-xl border border-neutral-800 bg-[#181818] p-8 shadow-lg"
             >
               {/* Founder Contact */}
@@ -636,21 +1068,27 @@ export default function VCPartnersPage() {
                 <h3 className="text-lg font-semibold">Founder Contact Information</h3>
                 <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div>
-                    <Label className="text-neutral-400 text-xs uppercase tracking-wide">Founder First Name *</Label>
+                    <Label className="text-neutral-400 text-xs uppercase tracking-wide">
+                      Founder First Name *
+                    </Label>
                     <Input
                       {...register("founderFirstName", { required: true })}
                       className="mt-2 !bg-[var(--form-input-bg)] border border-neutral-700 text-white placeholder-neutral-500 focus:border-lime-300"
                     />
                   </div>
                   <div>
-                    <Label className="text-neutral-400 text-xs uppercase tracking-wide">Founder Last Name *</Label>
+                    <Label className="text-neutral-400 text-xs uppercase tracking-wide">
+                      Founder Last Name *
+                    </Label>
                     <Input
                       {...register("founderLastName", { required: true })}
                       className="mt-2 !bg-[var(--form-input-bg)] border border-neutral-700 text-white placeholder-neutral-500 focus:border-lime-300"
                     />
                   </div>
                   <div>
-                    <Label className="text-neutral-400 text-xs uppercase tracking-wide">Main Founder Email *</Label>
+                    <Label className="text-neutral-400 text-xs uppercase tracking-wide">
+                      Main Founder Email *
+                    </Label>
                     <Input
                       type="email"
                       {...register("founderEmail", {
@@ -736,7 +1174,9 @@ export default function VCPartnersPage() {
                 <h3 className="text-lg font-semibold">Company Basic Information</h3>
                 <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div>
-                    <Label className="text-neutral-400 text-xs uppercase tracking-wide">Company Name *</Label>
+                    <Label className="text-neutral-400 text-xs uppercase tracking-wide">
+                      Company Name *
+                    </Label>
                     <Input
                       {...register("companyName", { required: true })}
                       className="mt-2 !bg-[var(--form-input-bg)] border border-neutral-700 text-white placeholder-neutral-500 focus:border-lime-300"
@@ -764,18 +1204,22 @@ export default function VCPartnersPage() {
                     />
                   </div>
 
-                  
-
                   {/* Industry: react-select multi (≤4) */}
                   <div className="sm:col-span-2">
-                    <Label className="text-neutral-400 text-xs uppercase tracking-wide">Industry (choose up to 4) *</Label>
+                    <Label className="text-neutral-400 text-xs uppercase tracking-wide">
+                      Industry (choose up to 4) *
+                    </Label>
                     <Controller
                       control={control}
                       name="industry"
-                      rules={{ validate: (v) => (v?.length ?? 0) > 0 && (v?.length ?? 0) <= 4 }}
+                      rules={{
+                        validate: (v) => (v?.length ?? 0) > 0 && (v?.length ?? 0) <= 4,
+                      }}
                       render={({ field }) => {
                         const options = industryOptions.map((x) => ({ value: x, label: x }));
-                        const value = options.filter((o) => (field.value || []).includes(o.value));
+                        const value = options.filter((o) =>
+                          (field.value || []).includes(o.value)
+                        );
                         return (
                           <Select<OptionType, true, GroupBase<OptionType>>
                             isMulti
@@ -793,22 +1237,29 @@ export default function VCPartnersPage() {
                         );
                       }}
                     />
-                    <p className="mt-1 text-xs text-neutral-500">{(watch("industry") || []).length}/4 selected</p>
+                    <p className="mt-1 text-xs text-neutral-500">
+                      {(watch("industry") || []).length}/4 selected
+                    </p>
                   </div>
 
                   {/* Region: shadcn single-select */}
                   <div className="sm:col-span-2">
-                    <Label className="text-neutral-400 text-xs uppercase tracking-wide">Company Location (Region) *</Label>
+                    <Label className="text-neutral-400 text-xs uppercase tracking-wide">
+                      Company Location (Region) *
+                    </Label>
                     <Controller
                       control={control}
                       name="companyRegion"
                       rules={{ required: true }}
                       render={({ field }) => (
-                        <ShadSelect onValueChange={(val) => {
-                          field.onChange(val);
-                          // clear state if region changes away from US
-                          if (val !== "United States") setValue("companyState", "");
-                        }} value={field.value}>
+                        <ShadSelect
+                          onValueChange={(val) => {
+                            field.onChange(val);
+                            // clear state if region changes away from US
+                            if (val !== "United States") setValue("companyState", "");
+                          }}
+                          value={field.value}
+                        >
                           <SelectTrigger className="mt-2 !bg-[var(--form-input-bg)] border border-neutral-700 text-white focus:border-lime-300">
                             <SelectValue placeholder="Select region" />
                           </SelectTrigger>
@@ -827,12 +1278,15 @@ export default function VCPartnersPage() {
                   {/* Conditional: State when US */}
                   {region === "United States" && (
                     <div className="sm:col-span-2">
-                      <Label className="text-neutral-400 text-xs uppercase tracking-wide">State *</Label>
+                      <Label className="text-neutral-400 text-xs uppercase tracking-wide">
+                        State *
+                      </Label>
                       <Controller
                         control={control}
                         name="companyState"
                         rules={{
-                          validate: (v) => region !== "United States" || !!v || "Please select a state",
+                          validate: (v) =>
+                            region !== "United States" || !!v || "Please select a state",
                         }}
                         render={({ field }) => (
                           <ShadSelect onValueChange={field.onChange} value={field.value}>
@@ -851,8 +1305,11 @@ export default function VCPartnersPage() {
                       />
                     </div>
                   )}
+
                   <div className="sm:col-span-2">
-                    <Label className="text-neutral-400 text-xs uppercase tracking-wide">Elevator Pitch (300 chars) *</Label>
+                    <Label className="text-neutral-400 text-xs uppercase tracking-wide">
+                      Elevator Pitch (300 chars) *
+                    </Label>
                     <Textarea
                       rows={4}
                       maxLength={300}
@@ -860,17 +1317,16 @@ export default function VCPartnersPage() {
                       placeholder="Tell us briefly about your business…"
                       className="mt-2 !bg-[var(--form-input-bg)] border border-neutral-700 text-white placeholder-neutral-500 focus:border-lime-300"
                     />
-                    <div className="mt-1 text-xs text-neutral-500">{elevatorPitch.length}/300</div>
+                    <div className="mt-1 text-xs text-neutral-500">
+                      {elevatorPitch.length}/300
+                    </div>
                   </div>
 
-                  {/* ✅ NEW: Business Model (placed right after Elevator Pitch as requested) */}
+                  {/* ✅ NEW: Business Model */}
                   <div className="sm:col-span-2">
                     <Label className="text-neutral-400 text-xs uppercase tracking-wide">
                       Business Model *
                     </Label>
-                    {/* <span className="text-neutral-500 text-[12px]">
-                      Summarize how your business creates and captures value: what you sell, who you sell to, and how revenue comes in.
-                    </span> */}
                     <Textarea
                       rows={4}
                       {...register("businessModel", { required: true })}
@@ -880,7 +1336,9 @@ export default function VCPartnersPage() {
                   </div>
 
                   <div className="sm:col-span-2 ">
-                    <Label className="text-neutral-400 text-xs uppercase tracking-wide">Pitch Deck (PDF) *</Label>
+                    <Label className="text-neutral-400 text-xs uppercase tracking-wide">
+                      Pitch Deck (PDF) *
+                    </Label>
                     <div className="relative mt-2">
                       <Input
                         type="file"
@@ -888,7 +1346,8 @@ export default function VCPartnersPage() {
                         {...register("pitchDeckPdf", {
                           required: true,
                           onChange: (e) => {
-                            const file = (e.target as HTMLInputElement).files?.[0] ?? null;
+                            const file =
+                              (e.target as HTMLInputElement).files?.[0] ?? null;
                             setSelectedFile(file);
                           },
                         })}
@@ -912,7 +1371,9 @@ export default function VCPartnersPage() {
                   </div>
 
                   <div>
-                    <Label className="text-neutral-400 text-xs uppercase tracking-wide">Pitch Deck (Link)</Label>
+                    <Label className="text-neutral-400 text-xs uppercase tracking-wide">
+                      Pitch Deck (Link)
+                    </Label>
                     <Input
                       type="url"
                       {...register("pitchDeckLink")}
@@ -926,50 +1387,218 @@ export default function VCPartnersPage() {
               {/* Eligibility */}
               <section className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>
-                  <Label className="text-neutral-400 text-xs uppercase tracking-wide">B2B SaaS with ≥3 months runway? *</Label>
+                  <Label className="text-neutral-400 text-xs uppercase tracking-wide">
+                    B2B SaaS with ≥3 months runway? *
+                  </Label>
                   <div className="mt-2">
                     <PillYesNo name="isB2BSaaSWithRunway" register={register} />
                   </div>
                 </div>
                 <div>
-                  <Label className="text-neutral-400 text-xs uppercase tracking-wide">Sell a physical product on your website? *</Label>
+                  <Label className="text-neutral-400 text-xs uppercase tracking-wide">
+                    Sell a physical product on your website? *
+                  </Label>
                   <div className="mt-2">
                     <PillYesNo name="sellsPhysicalProduct" register={register} />
                   </div>
                 </div>
                 <div>
-                  <Label className="text-neutral-400 text-xs uppercase tracking-wide">One or more founder above 50? *</Label>
+                  <Label className="text-neutral-400 text-xs uppercase tracking-wide">
+                    One or more founder above 50? *
+                  </Label>
                   <div className="mt-2">
                     <PillYesNo name="hasFounderOver50" register={register} />
                   </div>
                 </div>
                 <div>
-                  <Label className="text-neutral-400 text-xs uppercase tracking-wide">One or more black founders? *</Label>
+                  <Label className="text-neutral-400 text-xs uppercase tracking-wide">
+                    One or more black founders? *
+                  </Label>
                   <div className="mt-2">
                     <PillYesNo name="hasBlackFounder" register={register} />
                   </div>
                 </div>
 
                 <div>
-                  <Label className="text-neutral-400 text-xs uppercase tracking-wide">Do you have one or more female founders? *</Label>
+                  <Label className="text-neutral-400 text-xs uppercase tracking-wide">
+                    Do you have one or more female founders? *
+                  </Label>
                   <div className="mt-2">
                     <PillYesNo name="hasFemaleFounder" register={register} />
                   </div>
                 </div>
                 <div>
-                  <Label className="text-neutral-400 text-xs uppercase tracking-wide">Are you a foreign-born founder living in the United States? *</Label>
+                  <Label className="text-neutral-400 text-xs uppercase tracking-wide">
+                    Are you a foreign-born founder living in the United States? *
+                  </Label>
                   <div className="mt-2">
                     <PillYesNo name="isForeignBornInUS" register={register} />
                   </div>
                 </div>
               </section>
 
+              {/* ✅ Fund-specific questions */}
+              {(isEcomFundSelected || isB2bAccelSelected || isOutlanderSelected) && (
+                <section className="space-y-6">
+                  <h3 className="text-lg font-semibold">Fund-Specific Questions</h3>
+
+                  {/* E-Commerce Ecosystem Builders */}
+                  {isEcomFundSelected && (
+                    <div className="rounded-lg border border-neutral-800 bg-[#141414] p-4 space-y-5">
+                      <div>
+                        <h4 className="font-semibold">E-Commerce Ecosystem Builders Fund</h4>
+                        <p className="text-xs text-neutral-500 mt-1">
+                          Required only if you selected this fund.
+                        </p>
+                      </div>
+
+                      <div>
+                        <Label className="text-neutral-400 text-xs uppercase tracking-wide">
+                          How many customers/users do you have? *
+                        </Label>
+                        <Input
+                          type="number"
+                          step="any"
+                          {...register("ecomCustomerCount", {
+                            validate: (v) => {
+                              if (!isEcomFundSelected) return true;
+                              if (!v) return "Customer/user count is required";
+                              return !isNaN(Number(v)) || "Enter a valid number";
+                            },
+                          })}
+                          placeholder="1234"
+                          className="mt-2 !bg-[var(--form-input-bg)] border border-neutral-700 text-white placeholder-neutral-500 focus:border-lime-300"
+                        />
+                      </div>
+
+                      <div>
+                        <Label className="text-neutral-400 text-xs uppercase tracking-wide">
+                          If e-commerce merchants aren’t currently part of your customer base, are you planning to expand into that segment? *
+                        </Label>
+                        <div className="mt-2">
+                          <PillYesNo name="ecomPlansMerchants" register={register} />
+                        </div>
+                      </div>
+
+                      <div>
+                        <Label className="text-neutral-400 text-xs uppercase tracking-wide">
+                          What E-Commerce Platforms are you currently integrated with? *
+                        </Label>
+
+                        <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          {["Shopify", "WooCommerce", "Shopline", "Wix", "Other", "None"].map(
+                            (p) => (
+                              <label
+                                key={p}
+                                className="flex items-center gap-2 text-sm text-neutral-200"
+                              >
+                                <input
+                                  type="checkbox"
+                                  value={p}
+                                  {...register("ecomPlatforms", {
+                                    validate: (arr) => {
+                                      if (!isEcomFundSelected) return true;
+                                      const list = (arr ?? []) as unknown as string[];
+                                      if (!list.length) return "Select at least one platform option";
+                                      if (list.includes("None") && list.length > 1)
+                                        return `"None" can't be selected with other platforms`;
+                                      return true;
+                                    },
+                                  })}
+                                  className="accent-lime-300"
+                                />
+                                {p}
+                              </label>
+                            )
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* B2B SaaS Accel */}
+                  {isB2bAccelSelected && (
+                    <div className="rounded-lg border border-neutral-800 bg-[#141414] p-4 space-y-5">
+                      <div>
+                        <h4 className="font-semibold">LvlUp Ventures B2B SaaS Accel Fund</h4>
+                        <p className="text-xs text-neutral-500 mt-1">
+                          Required only if you selected this fund.
+                        </p>
+                      </div>
+
+                      <div>
+                        <Label className="text-neutral-400 text-xs uppercase tracking-wide">
+                          Are you incorporated in the United States? *
+                        </Label>
+                        <div className="mt-2 flex items-center gap-3">
+                          <PillYesNo name="b2bIncorporatedUS" register={register} />
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setValue("b2bIncorporatedUS", undefined as unknown as YesNo)
+                            }
+                            className="text-xs text-neutral-400 underline hover:text-neutral-200"
+                          >
+                            Clear selection
+                          </button>
+                        </div>
+                      </div>
+
+                      <div>
+                        <Label className="text-neutral-400 text-xs uppercase tracking-wide">
+                          Trailing 12 Month Revenue *
+                        </Label>
+                        <Input
+                          type="number"
+                          step="any"
+                          {...register("b2bTrailing12MoRevenue", {
+                            validate: (v) => {
+                              if (!isB2bAccelSelected) return true;
+                              if (!v) return "Trailing 12 month revenue is required";
+                              return !isNaN(Number(v)) || "Enter a valid number";
+                            },
+                          })}
+                          placeholder="250000"
+                          className="mt-2 !bg-[var(--form-input-bg)] border border-neutral-700 text-white placeholder-neutral-500 focus:border-lime-300"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Outlander VC requirement */}
+                  {isOutlanderSelected && (
+                    <div className="rounded-lg border border-neutral-800 bg-[#141414] p-4 space-y-4">
+                      <div>
+                        <h4 className="font-semibold">Outlander VC Eligibility</h4>
+                        <p className="text-xs text-neutral-500 mt-1">
+                          This is required to be eligible for Outlander VC consideration.
+                        </p>
+                      </div>
+
+                      <div>
+                        <Label className="text-neutral-400 text-xs uppercase tracking-wide">
+                          Does your team have a technical founder or technical lead who owns at least 10% equity in the company? *
+                        </Label>
+                        <div className="mt-2">
+                          <PillYesNo
+                            name="outlanderHasTechnical10pct"
+                            register={register}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </section>
+              )}
+
               {/* Financials */}
               <section>
                 <h3 className="text-lg font-semibold">Company Financial Information</h3>
                 <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div>
-                    <Label className="text-neutral-400 text-xs uppercase tracking-wide">Fundraising Stage *</Label>
+                    <Label className="text-neutral-400 text-xs uppercase tracking-wide">
+                      Fundraising Stage *
+                    </Label>
                     <Controller
                       control={control}
                       name="fundraisingStage"
@@ -992,7 +1621,9 @@ export default function VCPartnersPage() {
                   </div>
 
                   <div>
-                    <Label className="text-neutral-400 text-xs uppercase tracking-wide">Raise Amount *</Label>
+                    <Label className="text-neutral-400 text-xs uppercase tracking-wide">
+                      Raise Amount *
+                    </Label>
                     <Input
                       {...register("raiseAmount", {
                         required: "Raise amount is required",
@@ -1004,7 +1635,9 @@ export default function VCPartnersPage() {
                   </div>
 
                   <div>
-                    <Label className="text-neutral-400 text-xs uppercase tracking-wide">Valuation *</Label>
+                    <Label className="text-neutral-400 text-xs uppercase tracking-wide">
+                      Valuation *
+                    </Label>
                     <Input
                       {...register("valuation", {
                         required: "Valuation is required",
@@ -1016,7 +1649,9 @@ export default function VCPartnersPage() {
                   </div>
 
                   <div>
-                    <Label className="text-neutral-400 text-xs uppercase tracking-wide">Company MRR *</Label>
+                    <Label className="text-neutral-400 text-xs uppercase tracking-wide">
+                      Company MRR *
+                    </Label>
                     <Input
                       {...register("mrr", {
                         required: "MRR is required",
@@ -1028,7 +1663,9 @@ export default function VCPartnersPage() {
                   </div>
 
                   <div>
-                    <Label className="text-neutral-400 text-xs uppercase tracking-wide">Company Burn Rate *</Label>
+                    <Label className="text-neutral-400 text-xs uppercase tracking-wide">
+                      Company Burn Rate *
+                    </Label>
                     <Input
                       {...register("burnRate", {
                         required: "Burn rate is required",
@@ -1040,7 +1677,9 @@ export default function VCPartnersPage() {
                   </div>
 
                   <div>
-                    <Label className="text-neutral-400 text-xs uppercase tracking-wide">Previously Raised Capital *</Label>
+                    <Label className="text-neutral-400 text-xs uppercase tracking-wide">
+                      Previously Raised Capital *
+                    </Label>
                     <Input
                       {...register("previouslyRaised", {
                         required: "Previous funding amount required",
@@ -1101,8 +1740,17 @@ export default function VCPartnersPage() {
                       fundraisingStage: "",
                       programs: [],
                       competitions: [],
-                      businessModel: "", // ✅ NEW
+                      businessModel: "",
+
+                      // fund-specific
+                      ecomCustomerCount: "",
+                      ecomPlansMerchants: undefined as unknown as YesNo,
+                      ecomPlatforms: [],
+                      b2bIncorporatedUS: undefined as unknown as YesNo,
+                      b2bTrailing12MoRevenue: "",
+                      outlanderHasTechnical10pct: undefined as unknown as YesNo,
                     });
+
                     setSelectedPartners([]);
                     setSelectedCompetitions([]);
                     setSelectedPrograms([]);
