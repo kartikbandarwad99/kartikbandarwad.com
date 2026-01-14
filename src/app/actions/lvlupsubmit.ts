@@ -59,7 +59,7 @@ export async function submitApplicationAction(
       if (upErr) {
         return { ok: false, error: upErr.message };
       }
-      reminder: deck_pdf_path = up?.path ?? objectName;
+
       deck_pdf_path = up?.path ?? objectName;
     }
 
@@ -69,18 +69,8 @@ export async function submitApplicationAction(
     const toNum = (v: unknown) => {
       if (v === null || v === undefined || v === "") return null;
       const n =
-        typeof v === "number"
-          ? v
-          : parseFloat(String(v).replace(/[, ]/g, ""));
+        typeof v === "number" ? v : parseFloat(String(v).replace(/[, ]/g, ""));
       return Number.isFinite(n) ? n : null;
-    };
-
-    const toBool = (v: unknown) => {
-      if (v === null || v === undefined) return null;
-      if (typeof v === "boolean") return v;
-      if (v === "yes") return true;
-      if (v === "no") return false;
-      return null;
     };
 
     // co-founder flag from payload
@@ -119,9 +109,7 @@ export async function submitApplicationAction(
         cofounder_last_name: hasCoFounder
           ? payload?.founder?.cofounderLastName ?? null
           : null,
-        cofounder_email: hasCoFounder
-          ? payload?.founder?.cofounderEmail ?? null
-          : null,
+        cofounder_email: hasCoFounder ? payload?.founder?.cofounderEmail ?? null : null,
 
         company_name: payload?.company?.name ?? null,
         company_website: payload?.company?.website ?? null,
@@ -139,13 +127,19 @@ export async function submitApplicationAction(
         competitions_selected: payload?.competitionsSelected ?? null,
         programs_selected: payload?.programsSelected ?? null,
 
-        b2b_saas_with_3mo_runway: payload?.eligibility?.b2bSaaSWith3MoRunway ?? null,
+        // ✅ NEW: VC-backed
+        is_vc_backed: payload?.eligibility?.isVCBacked ?? null,
+
+        b2b_saas_with_3mo_runway:
+          payload?.eligibility?.b2bSaaSWith3MoRunway ?? null,
         sells_physical_product: payload?.eligibility?.sellsPhysicalProduct ?? null,
         has_founder_over_50: payload?.eligibility?.hasFounderOver50 ?? null,
         has_black_founder: payload?.eligibility?.hasBlackFounder ?? null,
         has_female_founder: payload?.eligibility?.hasFemaleFounder ?? null,
-        is_foreign_born_founder_in_us: payload?.eligibility?.isForeignBornFounderInUS ?? null,
-        wants_other_competitions: payload?.eligibility?.wantsOtherCompetitions ?? null,
+        is_foreign_born_founder_in_us:
+          payload?.eligibility?.isForeignBornFounderInUS ?? null,
+        wants_other_competitions:
+          payload?.eligibility?.wantsOtherCompetitions ?? null,
 
         fundraising_stage: payload?.financials?.fundraisingStage ?? null,
         raise_amount: toNum(payload?.financials?.raiseAmount),
@@ -155,12 +149,14 @@ export async function submitApplicationAction(
         previously_raised: toNum(payload?.financials?.previouslyRaised),
         runway_months: toNum(payload?.financials?.runwayMonths),
 
-        // ✅ NEW: fund-specific columns
+        // fund-specific columns
         ecom_customer_count: toNum(ecom?.customerCount),
-        ecom_plans_merchants: typeof ecom?.plansMerchants === "boolean" ? ecom.plansMerchants : null,
+        ecom_plans_merchants:
+          typeof ecom?.plansMerchants === "boolean" ? ecom.plansMerchants : null,
         ecom_platforms: ecomPlatforms,
 
-        b2b_incorporated_us: typeof b2b?.incorporatedUS === "boolean" ? b2b.incorporatedUS : null,
+        b2b_incorporated_us:
+          typeof b2b?.incorporatedUS === "boolean" ? b2b.incorporatedUS : null,
         b2b_trailing_12mo_revenue: toNum(b2b?.trailing12MoRevenue),
 
         outlander_has_technical_10pct:

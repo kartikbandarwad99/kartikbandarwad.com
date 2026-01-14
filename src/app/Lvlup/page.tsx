@@ -81,7 +81,10 @@ const customStyles = {
     color: "#fff",
     ":active": { backgroundColor: "#333333" },
   }),
-  indicatorsContainer: (base: any) => ({ ...base, backgroundColor: "transparent" }),
+  indicatorsContainer: (base: any) => ({
+    ...base,
+    backgroundColor: "transparent",
+  }),
   indicatorSeparator: (base: any) => ({ ...base, backgroundColor: "#404040" }),
 };
 
@@ -192,7 +195,8 @@ const partnersCards: PartnerCard[] = [
     name: "Greycroft",
     stage: "Seed to Series C",
     cheque: "Up to $50,000,000",
-    focus: "Software generalists with emphasis on AI apps (consumer/B2B) and infrastructure",
+    focus:
+      "Software generalists with emphasis on AI apps (consumer/B2B) and infrastructure",
     regions: "Primarily U.S.",
   },
   {
@@ -228,7 +232,7 @@ const partnersCards: PartnerCard[] = [
     focus: "Industry agnostic",
     regions:
       "Global founders accepted; onsite in Chattanooga, TN until $1M ARR (optional for other team members)",
-    criteria: "Founders committed to full focus and execution (“burn the ships”)",
+    criteria: 'Founders committed to full focus and execution (“burn the ships”)',
   },
   {
     id: "enough",
@@ -446,12 +450,56 @@ const stageSelect = [
 
 // US states (basic list)
 const US_STATES = [
-  "Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut","Delaware","Florida","Georgia",
-  "Hawaii","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky","Louisiana","Maine","Maryland",
-  "Massachusetts","Michigan","Minnesota","Mississippi","Missouri","Montana","Nebraska","Nevada","New Hampshire",
-  "New Jersey","New Mexico","New York","North Carolina","North Dakota","Ohio","Oklahoma","Oregon","Pennsylvania",
-  "Rhode Island","South Carolina","South Dakota","Tennessee","Texas","Utah","Vermont","Virginia","Washington",
-  "West Virginia","Wisconsin","Wyoming",
+  "Alabama",
+  "Alaska",
+  "Arizona",
+  "Arkansas",
+  "California",
+  "Colorado",
+  "Connecticut",
+  "Delaware",
+  "Florida",
+  "Georgia",
+  "Hawaii",
+  "Idaho",
+  "Illinois",
+  "Indiana",
+  "Iowa",
+  "Kansas",
+  "Kentucky",
+  "Louisiana",
+  "Maine",
+  "Maryland",
+  "Massachusetts",
+  "Michigan",
+  "Minnesota",
+  "Mississippi",
+  "Missouri",
+  "Montana",
+  "Nebraska",
+  "Nevada",
+  "New Hampshire",
+  "New Jersey",
+  "New Mexico",
+  "New York",
+  "North Carolina",
+  "North Dakota",
+  "Ohio",
+  "Oklahoma",
+  "Oregon",
+  "Pennsylvania",
+  "Rhode Island",
+  "South Carolina",
+  "South Dakota",
+  "Tennessee",
+  "Texas",
+  "Utah",
+  "Vermont",
+  "Virginia",
+  "Washington",
+  "West Virginia",
+  "Wisconsin",
+  "Wyoming",
 ];
 
 type YesNo = "yes" | "no";
@@ -479,6 +527,9 @@ type FormValues = {
 
   pitchDeckPdf?: FileList;
   pitchDeckLink?: string;
+
+  // ✅ NEW: VC-backed question
+  isVCBacked: YesNo;
 
   isB2BSaaSWithRunway: YesNo;
   sellsPhysicalProduct: YesNo;
@@ -599,6 +650,9 @@ export default function VCPartnersPage() {
       competitions: [],
       businessModel: "",
 
+      // ✅ NEW: VC-backed default
+      isVCBacked: undefined as unknown as YesNo,
+
       // Fund-specific defaults
       ecomCustomerCount: "",
       ecomPlansMerchants: undefined as unknown as YesNo,
@@ -635,6 +689,10 @@ export default function VCPartnersPage() {
 
     pitchDeckPdf: "Pitch Deck (PDF)",
     pitchDeckLink: "Pitch Deck (Link)",
+
+    // ✅ NEW label
+    isVCBacked: "VC-Backed",
+
     isB2BSaaSWithRunway: "B2B SaaS with ≥3 months runway",
     sellsPhysicalProduct: "Sell a physical product",
     hasFounderOver50: "Founder above 50",
@@ -663,8 +721,14 @@ export default function VCPartnersPage() {
   };
 
   // bind card selections into form values (for submission/clear)
-  useEffect(() => setValue("competitions", selectedCompetitions), [selectedCompetitions, setValue]);
-  useEffect(() => setValue("programs", selectedPrograms), [selectedPrograms, setValue]);
+  useEffect(
+    () => setValue("competitions", selectedCompetitions),
+    [selectedCompetitions, setValue]
+  );
+  useEffect(
+    () => setValue("programs", selectedPrograms),
+    [selectedPrograms, setValue]
+  );
 
   const elevatorPitch = watch("elevatorPitch") || "";
   const region = watch("companyRegion");
@@ -673,7 +737,9 @@ export default function VCPartnersPage() {
   const formRef = useRef<HTMLFormElement | null>(null);
 
   // fund selection flags
-  const isEcomFundSelected = selectedPartners.includes("lvlup-ecommerce-ecosystem-builders");
+  const isEcomFundSelected = selectedPartners.includes(
+    "lvlup-ecommerce-ecosystem-builders"
+  );
   const isB2bAccelSelected = selectedPartners.includes("lvlup-b2b-saas-accel");
   const isOutlanderSelected = selectedPartners.includes("outlander");
 
@@ -694,10 +760,10 @@ export default function VCPartnersPage() {
   }, [isEcomFundSelected, isB2bAccelSelected, isOutlanderSelected, setValue]);
 
   // useActionState -> action signature (prev, formData) => state
-  const [submitState, formAction, isPending] = useActionState<SubmitState, FormData>(
-    submitApplicationAction,
-    { ok: false }
-  );
+  const [submitState, formAction, isPending] = useActionState<
+    SubmitState,
+    FormData
+  >(submitApplicationAction, { ok: false });
 
   // show toast + clear on success
   useEffect(() => {
@@ -724,6 +790,10 @@ export default function VCPartnersPage() {
         businessModel: "",
         pitchDeckPdf: undefined,
         pitchDeckLink: "",
+
+        // ✅ NEW reset
+        isVCBacked: undefined as unknown as YesNo,
+
         isB2BSaaSWithRunway: undefined as unknown as YesNo,
         sellsPhysicalProduct: undefined as unknown as YesNo,
         hasFounderOver50: undefined as unknown as YesNo,
@@ -756,7 +826,9 @@ export default function VCPartnersPage() {
       setSelectedFile(null);
 
       // also remove hidden payload input if present
-      const existing = formRef.current?.querySelector('input[name="payload"]') as HTMLInputElement | null;
+      const existing = formRef.current?.querySelector(
+        'input[name="payload"]'
+      ) as HTMLInputElement | null;
       if (existing) existing.remove();
     } else if (submitState.error) {
       toast.error(submitState.error);
@@ -826,7 +898,10 @@ export default function VCPartnersPage() {
         toast.error("Please indicate whether you are incorporated in the U.S.");
         return;
       }
-      if (!vCheck.b2bTrailing12MoRevenue || isNaN(Number(vCheck.b2bTrailing12MoRevenue))) {
+      if (
+        !vCheck.b2bTrailing12MoRevenue ||
+        isNaN(Number(vCheck.b2bTrailing12MoRevenue))
+      ) {
         setFocus("b2bTrailing12MoRevenue" as any);
         toast.error("Please enter a valid Trailing 12 Month Revenue.");
         return;
@@ -836,7 +911,9 @@ export default function VCPartnersPage() {
     if (isOutlanderSelected) {
       if (!vCheck.outlanderHasTechnical10pct) {
         setFocus("outlanderHasTechnical10pct" as any);
-        toast.error("Please answer the Outlander VC technical lead equity requirement.");
+        toast.error(
+          "Please answer the Outlander VC technical lead equity requirement."
+        );
         return;
       }
     }
@@ -869,6 +946,9 @@ export default function VCPartnersPage() {
         deckLink: v.pitchDeckLink || null,
       },
       eligibility: {
+        // ✅ NEW
+        isVCBacked: v.isVCBacked === "yes",
+
         b2bSaaSWith3MoRunway: v.isB2BSaaSWithRunway === "yes",
         sellsPhysicalProduct: v.sellsPhysicalProduct === "yes",
         hasFounderOver50: v.hasFounderOver50 === "yes",
@@ -910,7 +990,9 @@ export default function VCPartnersPage() {
     };
 
     // ensure hidden "payload"
-    let hidden = formRef.current.querySelector('input[name="payload"]') as HTMLInputElement | null;
+    let hidden = formRef.current.querySelector(
+      'input[name="payload"]'
+    ) as HTMLInputElement | null;
     if (!hidden) {
       hidden = document.createElement("input");
       hidden.type = "hidden";
@@ -971,35 +1053,47 @@ export default function VCPartnersPage() {
                           </span>
                         )}
                       </div>
-                      {p.blurb && <p className="text-sm text-neutral-400 mt-2">{p.blurb}</p>}
+                      {p.blurb && (
+                        <p className="text-sm text-neutral-400 mt-2">{p.blurb}</p>
+                      )}
                       <div className="mt-3 grid gap-1 text-sm text-neutral-400">
                         {p.focus && (
                           <p>
-                            <span className="text-neutral-300 font-medium">Sectors:</span>{" "}
+                            <span className="text-neutral-300 font-medium">
+                              Sectors:
+                            </span>{" "}
                             {p.focus}
                           </p>
                         )}
                         {p.regions && (
                           <p>
-                            <span className="text-neutral-300 font-medium">Geography:</span>{" "}
+                            <span className="text-neutral-300 font-medium">
+                              Geography:
+                            </span>{" "}
                             {p.regions}
                           </p>
                         )}
                         {p.stage && (
                           <p>
-                            <span className="text-neutral-300 font-medium">Stage:</span>{" "}
+                            <span className="text-neutral-300 font-medium">
+                              Stage:
+                            </span>{" "}
                             {p.stage}
                           </p>
                         )}
                         {p.cheque && (
                           <p>
-                            <span className="text-neutral-300 font-medium">Cheque:</span>{" "}
+                            <span className="text-neutral-300 font-medium">
+                              Cheque:
+                            </span>{" "}
                             {p.cheque}
                           </p>
                         )}
                         {p.criteria && (
                           <p>
-                            <span className="text-neutral-300 font-medium">Additional Criteria:</span>{" "}
+                            <span className="text-neutral-300 font-medium">
+                              Additional Criteria:
+                            </span>{" "}
                             {p.criteria}
                           </p>
                         )}
@@ -1213,10 +1307,14 @@ export default function VCPartnersPage() {
                       control={control}
                       name="industry"
                       rules={{
-                        validate: (v) => (v?.length ?? 0) > 0 && (v?.length ?? 0) <= 4,
+                        validate: (v) =>
+                          (v?.length ?? 0) > 0 && (v?.length ?? 0) <= 4,
                       }}
                       render={({ field }) => {
-                        const options = industryOptions.map((x) => ({ value: x, label: x }));
+                        const options = industryOptions.map((x) => ({
+                          value: x,
+                          label: x,
+                        }));
                         const value = options.filter((o) =>
                           (field.value || []).includes(o.value)
                         );
@@ -1386,6 +1484,16 @@ export default function VCPartnersPage() {
 
               {/* Eligibility */}
               <section className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                {/* ✅ NEW: VC-Backed */}
+                <div>
+                  <Label className="text-neutral-400 text-xs uppercase tracking-wide">
+                    Are you VC-Backed? *
+                  </Label>
+                  <div className="mt-2">
+                    <PillYesNo name="isVCBacked" register={register} />
+                  </div>
+                </div>
+
                 <div>
                   <Label className="text-neutral-400 text-xs uppercase tracking-wide">
                     B2B SaaS with ≥3 months runway? *
@@ -1394,6 +1502,7 @@ export default function VCPartnersPage() {
                     <PillYesNo name="isB2BSaaSWithRunway" register={register} />
                   </div>
                 </div>
+
                 <div>
                   <Label className="text-neutral-400 text-xs uppercase tracking-wide">
                     Sell a physical product on your website? *
@@ -1473,7 +1582,8 @@ export default function VCPartnersPage() {
 
                       <div>
                         <Label className="text-neutral-400 text-xs uppercase tracking-wide">
-                          If e-commerce merchants aren’t currently part of your customer base, are you planning to expand into that segment? *
+                          If e-commerce merchants aren’t currently part of your customer base,
+                          are you planning to expand into that segment? *
                         </Label>
                         <div className="mt-2">
                           <PillYesNo name="ecomPlansMerchants" register={register} />
@@ -1499,7 +1609,8 @@ export default function VCPartnersPage() {
                                     validate: (arr) => {
                                       if (!isEcomFundSelected) return true;
                                       const list = (arr ?? []) as unknown as string[];
-                                      if (!list.length) return "Select at least one platform option";
+                                      if (!list.length)
+                                        return "Select at least one platform option";
                                       if (list.includes("None") && list.length > 1)
                                         return `"None" can't be selected with other platforms`;
                                       return true;
@@ -1577,7 +1688,8 @@ export default function VCPartnersPage() {
 
                       <div>
                         <Label className="text-neutral-400 text-xs uppercase tracking-wide">
-                          Does your team have a technical founder or technical lead who owns at least 10% equity in the company? *
+                          Does your team have a technical founder or technical lead who owns
+                          at least 10% equity in the company? *
                         </Label>
                         <div className="mt-2">
                           <PillYesNo
@@ -1713,7 +1825,8 @@ export default function VCPartnersPage() {
               {/* Other pitch competitions question */}
               <section>
                 <Label className="text-neutral-400 text-xs uppercase tracking-wide">
-                  Do you want to participate in other pitch competitions hosted by or in partnership with LvlUp Ventures? *
+                  Do you want to participate in other pitch competitions hosted by or in
+                  partnership with LvlUp Ventures? *
                 </Label>
                 <span className="text-neutral-500 text-[12px]">(Subject to change)</span>
                 <div className="mt-2">
@@ -1741,6 +1854,9 @@ export default function VCPartnersPage() {
                       programs: [],
                       competitions: [],
                       businessModel: "",
+
+                      // ✅ NEW clear
+                      isVCBacked: undefined as unknown as YesNo,
 
                       // fund-specific
                       ecomCustomerCount: "",
