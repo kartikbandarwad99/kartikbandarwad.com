@@ -24,6 +24,8 @@ import {
   submitApplicationAction,
   type SubmitState,
 } from "@/app/actions/lvlupsubmit";
+import { supabaseBrowser } from "@/utils/supabase/browserClient";
+import { createDeckUploadAction } from "@/app/actions/createDeckUpload";
 
 // ============================ react-select dark styles ============================
 const customStyles = {
@@ -836,174 +838,226 @@ export default function VCPartnersPage() {
   }, [submitState, reset]);
 
   const handleSubmitClick = async () => {
-    // Validate form fields first
-    const isValid = await trigger(undefined, { shouldFocus: true });
+  // Validate form fields first
+  const isValid = await trigger(undefined, { shouldFocus: true });
 
-    // Handle RHF field errors
-    if (!isValid) {
-      const fields = Object.keys(formState.errors) as (keyof FormValues)[];
-      if (fields.length) {
-        const first = fields[0];
-        const firstError = formState.errors[first];
-        setFocus(first as any);
-        const msg =
-          (firstError?.message as string | undefined) ||
-          `${FIELD_LABEL[first] ?? "This field"} is required`;
-        toast.error(msg);
-      } else {
-        toast.error("Please complete the required fields.");
-      }
+  // Handle RHF field errors
+  if (!isValid) {
+    const fields = Object.keys(formState.errors) as (keyof FormValues)[];
+    if (fields.length) {
+      const first = fields[0];
+      const firstError = formState.errors[first];
+      setFocus(first as any);
+      const msg =
+        (firstError?.message as string | undefined) ||
+        `${FIELD_LABEL[first] ?? "This field"} is required`;
+      toast.error(msg);
+    } else {
+      toast.error("Please complete the required fields.");
+    }
+    return;
+  }
+
+  // Enforce VC partners selection (at least 1)
+  if (selectedPartners.length === 0) {
+    toast.error("Please select at least one VC partner.");
+    return;
+  }
+
+  // If United States is selected, ensure State is provided
+  const vCheck = getValues();
+  if (vCheck.companyRegion === "United States" && !vCheck.companyState) {
+    setFocus("companyState" as any);
+    toast.error("Please select a state.");
+    return;
+  }
+
+  // Fund-specific defensive checks
+  if (isEcomFundSelected) {
+    if (!vCheck.ecomCustomerCount || isNaN(Number(vCheck.ecomCustomerCount))) {
+      setFocus("ecomCustomerCount" as any);
+      toast.error("Please enter a valid customer/user count.");
       return;
     }
-
-    // Enforce VC partners selection (at least 1)
-    if (selectedPartners.length === 0) {
-      toast.error("Please select at least one VC partner.");
+    if (!vCheck.ecomPlansMerchants) {
+      setFocus("ecomPlansMerchants" as any);
+      toast.error("Please answer the merchants expansion question.");
       return;
     }
-
-    // If United States is selected, ensure State is provided (defensive check in case user skipped)
-    const vCheck = getValues();
-    if (vCheck.companyRegion === "United States" && !vCheck.companyState) {
-      setFocus("companyState" as any);
-      toast.error("Please select a state.");
+    if (!vCheck.ecomPlatforms?.length) {
+      toast.error("Please select at least one E-Commerce platform option.");
       return;
     }
-
-    // Fund-specific defensive checks
-    if (isEcomFundSelected) {
-      if (!vCheck.ecomCustomerCount || isNaN(Number(vCheck.ecomCustomerCount))) {
-        setFocus("ecomCustomerCount" as any);
-        toast.error("Please enter a valid customer/user count.");
-        return;
-      }
-      if (!vCheck.ecomPlansMerchants) {
-        setFocus("ecomPlansMerchants" as any);
-        toast.error("Please answer the merchants expansion question.");
-        return;
-      }
-      if (!vCheck.ecomPlatforms?.length) {
-        toast.error("Please select at least one E-Commerce platform option.");
-        return;
-      }
-      if (vCheck.ecomPlatforms.includes("None") && vCheck.ecomPlatforms.length > 1) {
-        toast.error(`"None" can't be selected with other platforms.`);
-        return;
-      }
+    if (vCheck.ecomPlatforms.includes("None") && vCheck.ecomPlatforms.length > 1) {
+      toast.error(`"None" can't be selected with other platforms.`);
+      return;
     }
+  }
 
-    if (isB2bAccelSelected) {
-      if (!vCheck.b2bIncorporatedUS) {
-        setFocus("b2bIncorporatedUS" as any);
-        toast.error("Please indicate whether you are incorporated in the U.S.");
-        return;
-      }
-      if (
-        !vCheck.b2bTrailing12MoRevenue ||
-        isNaN(Number(vCheck.b2bTrailing12MoRevenue))
-      ) {
-        setFocus("b2bTrailing12MoRevenue" as any);
-        toast.error("Please enter a valid Trailing 12 Month Revenue.");
-        return;
-      }
+  if (isB2bAccelSelected) {
+    if (!vCheck.b2bIncorporatedUS) {
+      setFocus("b2bIncorporatedUS" as any);
+      toast.error("Please indicate whether you are incorporated in the U.S.");
+      return;
     }
-
-    if (isOutlanderSelected) {
-      if (!vCheck.outlanderHasTechnical10pct) {
-        setFocus("outlanderHasTechnical10pct" as any);
-        toast.error(
-          "Please answer the Outlander VC technical lead equity requirement."
-        );
-        return;
-      }
+    if (!vCheck.b2bTrailing12MoRevenue || isNaN(Number(vCheck.b2bTrailing12MoRevenue))) {
+      setFocus("b2bTrailing12MoRevenue" as any);
+      toast.error("Please enter a valid Trailing 12 Month Revenue.");
+      return;
     }
+  }
 
-    if (!formRef.current) return;
-
-    const v = getValues();
-    const payload = {
-      partnersSelected: selectedPartners,
-      competitionsSelected: selectedCompetitions,
-      programsSelected: selectedPrograms,
-      founder: {
-        firstName: v.founderFirstName,
-        lastName: v.founderLastName,
-        email: v.founderEmail,
-        phone: v.founderPhone,
-        hasCoFounder: v.hasCoFounder,
-        cofounderFirstName: v.cofounderFirstName || null,
-        cofounderLastName: v.cofounderLastName || null,
-        cofounderEmail: v.cofounderEmail || null,
-      },
-      company: {
-        name: v.companyName,
-        website: v.companyWebsite,
-        industries: v.industry,
-        region: v.companyRegion,
-        state: v.companyState || null,
-        elevatorPitch: v.elevatorPitch,
-        businessModel: v.businessModel,
-        deckLink: v.pitchDeckLink || null,
-      },
-      eligibility: {
-        // ✅ NEW
-        isVCBacked: v.isVCBacked === "yes",
-
-        b2bSaaSWith3MoRunway: v.isB2BSaaSWithRunway === "yes",
-        sellsPhysicalProduct: v.sellsPhysicalProduct === "yes",
-        hasFounderOver50: v.hasFounderOver50 === "yes",
-        hasBlackFounder: v.hasBlackFounder === "yes",
-        hasFemaleFounder: v.hasFemaleFounder === "yes",
-        isForeignBornFounderInUS: v.isForeignBornInUS === "yes",
-        wantsOtherCompetitions: v.wantsOtherCompetitions === "yes",
-      },
-      financials: {
-        fundraisingStage: v.fundraisingStage,
-        raiseAmount: v.raiseAmount,
-        valuation: v.valuation,
-        mrr: v.mrr,
-        burnRate: v.burnRate,
-        previouslyRaised: v.previouslyRaised,
-        runwayMonths: v.runwayMonths,
-      },
-      fundSpecific: {
-        ecomEcosystemBuilders: isEcomFundSelected
-          ? {
-              customerCount: v.ecomCustomerCount,
-              plansMerchants: v.ecomPlansMerchants === "yes",
-              platforms: v.ecomPlatforms,
-            }
-          : null,
-        b2bSaasAccel: isB2bAccelSelected
-          ? {
-              incorporatedUS: v.b2bIncorporatedUS === "yes",
-              trailing12MoRevenue: v.b2bTrailing12MoRevenue,
-            }
-          : null,
-        outlander: isOutlanderSelected
-          ? {
-              hasTechnicalLead10pct: v.outlanderHasTechnical10pct === "yes",
-            }
-          : null,
-      },
-      submittedAt: new Date().toISOString(),
-    };
-
-    // ensure hidden "payload"
-    let hidden = formRef.current.querySelector(
-      'input[name="payload"]'
-    ) as HTMLInputElement | null;
-    if (!hidden) {
-      hidden = document.createElement("input");
-      hidden.type = "hidden";
-      hidden.name = "payload";
-      formRef.current.appendChild(hidden);
+  if (isOutlanderSelected) {
+    if (!vCheck.outlanderHasTechnical10pct) {
+      setFocus("outlanderHasTechnical10pct" as any);
+      toast.error("Please answer the Outlander VC technical lead equity requirement.");
+      return;
     }
-    hidden.value = JSON.stringify(payload);
+  }
 
-    // native submit to the useActionState handler
-    formRef.current.requestSubmit();
+  if (!formRef.current) return;
+
+  const v = getValues();
+
+  // -------------------------
+  // Build payload (same as you had)
+  // -------------------------
+  const payload: any = {
+    partnersSelected: selectedPartners,
+    competitionsSelected: selectedCompetitions,
+    programsSelected: selectedPrograms,
+    founder: {
+      firstName: v.founderFirstName,
+      lastName: v.founderLastName,
+      email: v.founderEmail,
+      phone: v.founderPhone,
+      hasCoFounder: v.hasCoFounder,
+      cofounderFirstName: v.cofounderFirstName || null,
+      cofounderLastName: v.cofounderLastName || null,
+      cofounderEmail: v.cofounderEmail || null,
+    },
+    company: {
+      name: v.companyName,
+      website: v.companyWebsite,
+      industries: v.industry,
+      region: v.companyRegion,
+      state: v.companyState || null,
+      elevatorPitch: v.elevatorPitch,
+      businessModel: v.businessModel,
+      deckLink: v.pitchDeckLink || null,
+
+      // ✅ we will set deckPdfPath after upload
+      deckPdfPath: null as string | null,
+    },
+    eligibility: {
+      isVCBacked: v.isVCBacked === "yes",
+      b2bSaaSWith3MoRunway: v.isB2BSaaSWithRunway === "yes",
+      sellsPhysicalProduct: v.sellsPhysicalProduct === "yes",
+      hasFounderOver50: v.hasFounderOver50 === "yes",
+      hasBlackFounder: v.hasBlackFounder === "yes",
+      hasFemaleFounder: v.hasFemaleFounder === "yes",
+      isForeignBornFounderInUS: v.isForeignBornInUS === "yes",
+      wantsOtherCompetitions: v.wantsOtherCompetitions === "yes",
+    },
+    financials: {
+      fundraisingStage: v.fundraisingStage,
+      raiseAmount: v.raiseAmount,
+      valuation: v.valuation,
+      mrr: v.mrr,
+      burnRate: v.burnRate,
+      previouslyRaised: v.previouslyRaised,
+      runwayMonths: v.runwayMonths,
+    },
+    fundSpecific: {
+      ecomEcosystemBuilders: isEcomFundSelected
+        ? {
+            customerCount: v.ecomCustomerCount,
+            plansMerchants: v.ecomPlansMerchants === "yes",
+            platforms: v.ecomPlatforms,
+          }
+        : null,
+      b2bSaasAccel: isB2bAccelSelected
+        ? {
+            incorporatedUS: v.b2bIncorporatedUS === "yes",
+            trailing12MoRevenue: v.b2bTrailing12MoRevenue,
+          }
+        : null,
+      outlander: isOutlanderSelected
+        ? {
+            hasTechnicalLead10pct: v.outlanderHasTechnical10pct === "yes",
+          }
+        : null,
+    },
+    submittedAt: new Date().toISOString(),
   };
+
+  // -------------------------
+  // ✅ Direct upload PDF to Supabase (bypasses Vercel 413)
+  // -------------------------
+  const file = v.pitchDeckPdf?.[0] ?? null;
+
+  if (file) {
+    try {
+      const ext = (file.name.split(".").pop() || "pdf").toLowerCase();
+
+      const signed = await createDeckUploadAction({
+        email: v.founderEmail,
+        company: v.companyName,
+        ext,
+      });
+
+      const supa = supabaseBrowser();
+
+      const { error: upErr } = await supa.storage
+        .from("pitch-decks")
+        .uploadToSignedUrl(signed.path, signed.token, file, {
+          contentType: file.type || "application/pdf",
+        });
+
+      if (upErr) {
+        toast.error(upErr.message);
+        return;
+      }
+
+      payload.company.deckPdfPath = signed.path;
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to upload PDF");
+      return;
+    }
+  } else {
+    toast.error("Pitch Deck PDF is required.");
+    return;
+  }
+
+  // -------------------------
+  // Send ONLY payload to Server Action (no file)
+  // -------------------------
+  let hidden = formRef.current.querySelector(
+    'input[name="payload"]'
+  ) as HTMLInputElement | null;
+  if (!hidden) {
+    hidden = document.createElement("input");
+    hidden.type = "hidden";
+    hidden.name = "payload";
+    formRef.current.appendChild(hidden);
+  }
+  hidden.value = JSON.stringify(payload);
+
+  // ✅ Prevent file input from being included in the POST to the server action
+  const fileInput = formRef.current.querySelector(
+    'input[type="file"][name="pitchDeckPdf"]'
+  ) as HTMLInputElement | null;
+
+  const originalName = fileInput?.name;
+  if (fileInput) fileInput.name = "pitchDeckPdf_disabled";
+
+  formRef.current.requestSubmit();
+
+  // restore name after submit (keeps RHF behavior normal)
+  setTimeout(() => {
+    if (fileInput && originalName) fileInput.name = originalName;
+  }, 0);
+};
 
   const handleClearFile = () => {
     setSelectedFile(null);
