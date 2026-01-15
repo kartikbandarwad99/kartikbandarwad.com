@@ -1048,16 +1048,14 @@ export default function VCPartnersPage() {
     'input[type="file"][name="pitchDeckPdf"]'
   ) as HTMLInputElement | null;
 
-  const originalName = fileInput?.name;
-  if (fileInput) fileInput.name = "pitchDeckPdf_disabled";
+  if (fileInput) fileInput.disabled = true;   // ✅ THIS is the key
 
   formRef.current.requestSubmit();
 
-  // restore name after submit (keeps RHF behavior normal)
   setTimeout(() => {
-    if (fileInput && originalName) fileInput.name = originalName;
+    if (fileInput) fileInput.disabled = false; // restore for UI
   }, 0);
-};
+  };
 
   const handleClearFile = () => {
     setSelectedFile(null);
